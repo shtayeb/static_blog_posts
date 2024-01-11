@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Shahryar Tayeb</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Shahryar Tayeb" />
+    <link rel="stylesheet" type="text/css" href="styles/style.css" />
+    <link rel="stylesheet" type="text/css" href="styles/timeline.css" />
+    
+
+    <!-- Icons-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./img/logo_dark.svg"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./img/logo_dark.svg"
+    />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+
+    <link rel="stylesheet" type="text/css" href="styles/theme.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- and it's easy to individually load additional languages -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/js.min.js"></script>
+
+    <script>hljs.highlightAll();</script>
+
+  </head>
+  <body>
+    <section>
+      <h1>Event Delegation: A Technique to Improve JavaScript Performance</h1>
+      <p class="st">In this blog post, you will learn what event delegation is, how it can help you optimize your JavaScript code by reducing the number of event listeners, and how to implement it with a practical example.</p>
+      <br /><br />
+      <img style="width: 100%;" src="https://images.unsplash.com/photo-1682687981922-7b55dbb30892?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxfHx8ZW58MHx8fHx8" alt="banner">
+    </section>
+
+    <main>
+      <h2 id="introduction">Introduction</h2>
+      <p>
+        Let&#39;s start with an example. Suppose we have a navigation menu with
+        several links, and we want to implement a smooth scrolling effect when
+        the user clicks on any of the links.
+      </p>
+      <pre><code class="lang-html">&lt;nav <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"nav"</span>&gt;
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">ul</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"nav__links"</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"nav__item"</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"nav__link"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"#about"</span>&gt;</span>About<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"nav__item"</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"nav__link"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"#projects"</span>&gt;</span>Projects<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"nav__item"</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"nav__link"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"#testimonials"</span>&gt;</span>Testimonials<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+
+  <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span></span>
+&lt;<span class="hljs-regexp">/nav&gt;</span>
+</code></pre>
+      <h3 id="a-bad-approach">A bad approach</h3>
+      <p>
+        A naive approach would be to loop over all the links and add a click
+        event listener to each one of them, like this:
+      </p>
+      <pre><code class="lang-js"><span class="hljs-built_in">document</span>.querySelectorAll(<span class="hljs-string">'.nav__link'</span>).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">el</span>) </span>{
+    el.addEventListener(<span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>) </span>{
+        e.preventDefault();
+
+        <span class="hljs-keyword">const</span> id = <span class="hljs-keyword">this</span>.getAttribute(<span class="hljs-string">'href'</span>);
+
+        <span class="hljs-built_in">document</span>.querySelector(id).scrollIntoView({
+            <span class="hljs-attr">behavior</span>: <span class="hljs-string">'smooth'</span>
+        });
+    });
+});
+</code></pre>
+      <p>
+        This works, but it has a problem: we are adding as many event listeners
+        as there are links, which can affect the performance and memory usage of
+        our web page. Imagine if we have hundreds or thousands of links, that
+        would be a lot of unnecessary event listeners!
+      </p>
+      <p>How can we solve this problem? The answer is event delegation.</p>
+      <h3 id="a-better-approach">A better approach</h3>
+      <p>
+        Event delegation is a technique that allows us to attach a single event
+        listener to a common parent element, and then use the event object to
+        determine which child element triggered the event. This way, we can
+        handle multiple events with a single event listener, and avoid adding
+        too many event listeners to the DOM.
+      </p>
+      <p>To implement event delegation, we need to do two things:</p>
+      <ol>
+        <li>
+          Add a single event listener to the common parent element. In our case,
+          that would be the element with the class <code>nav__links</code>.
+        </li>
+        <li>
+          Use the event object to check which child element originated the
+          event. In our case, we only want to handle the events that come from
+          the elements with the class <code>nav__link</code>.
+        </li>
+      </ol>
+      <p>Here is how our code would look like with event delegation:</p>
+      <pre><code class="lang-js"><span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">'.nav__links'</span>).addEventListener(<span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>) </span>{
+    e.preventDefault();
+
+    <span class="hljs-keyword">if</span> (!e.target.classList.contains(<span class="hljs-string">'nav__link'</span>)) <span class="hljs-keyword">return</span>
+
+    <span class="hljs-keyword">const</span> id = e.target.getAttribute(<span class="hljs-string">'href'</span>);
+
+    <span class="hljs-built_in">document</span>.querySelector(id).scrollIntoView({
+        <span class="hljs-attr">behavior</span>: <span class="hljs-string">'smooth'</span>
+    });
+});
+</code></pre>
+      <ul>
+        <li>
+          The event can be triggered by any child element or the parent element
+          itself.
+        </li>
+        <li>
+          We are only interested in the events that come from the elements with
+          the class <code>nav__link</code>
+        </li>
+        <li>
+          <p>
+            Matching strategy: we use the <code>classList</code> property of the
+            event target to check if it contains the class
+            <code>nav__link</code>
+          </p>
+          <p>
+            The matching strategy is the most important part here, make sure to
+            adjust it to your own code. For example if one of our
+            <code>nav__link</code> has more that one child, the above matching
+            strategy wont work.
+          </p>
+          <pre><code class="lang-html"> &lt;a <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"nav__link"</span> href=<span class="hljs-string">"#section--3"</span>&gt;
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>[Child]<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>
+    Testimonials
+ &lt;<span class="hljs-regexp">/a&gt;</span>
+</code></pre>
+          <p>
+            In these cases the JavaScript selector <code>closest()</code> comes
+            very handy
+          </p>
+          <pre><code class="lang-js">  <span class="hljs-comment">// ...</span>
+
+  <span class="hljs-keyword">const</span> navLinkEl = e.<span class="hljs-keyword">target</span>.closest(<span class="hljs-string">'.nav__link'</span>);
+
+  <span class="hljs-keyword">const</span> id = navLinkEl.getAttribute(<span class="hljs-string">'href'</span>);
+
+  <span class="hljs-comment">// ....</span>
+</code></pre>
+        </li>
+      </ul>
+      <p>
+        As you can see, we have reduced the number of event listeners from N
+        (the number of links) to 1 (the parent element). This improves the
+        performance and memory usage of our web page, and also makes our code
+        more maintainable and scalable.
+      </p>
+      <h2 id="conclusion">Conclusion</h2>
+      <p>
+        Event delegation is a powerful technique that can help us optimize our
+        JavaScript code and handle multiple events with a single event listener.
+        It is based on the concept of event bubbling, which means that an event
+        that occurs on a child element will propagate up to its parent elements
+        until it reaches the document object. By using event delegation, we can
+        take advantage of this behavior and handle events at a higher level in
+        the DOM hierarchy.
+      </p>
+      <p>
+        I hope you enjoyed this blog post and learned something new about event
+        delegation. If you have any questions or feedback, please leave a
+        comment below. Thank you for reading!
+      </p>
+    </main>
+
+    <section>
+      <h2>Contact me</h2>
+      <p>
+        <a target="_blank" href="https://www.linkedin.com/in/shahryar-tayeb"
+          >LinkedIn</a
+        >
+        - <a target="_blank" href="https://www.github.com/shtayeb">Github</a> -
+        <a target="_blank" href="https://twitter.com/shahryar_tayeb">Twitter</a>
+        -
+        <a target="_blank" href="https://blog.shahryartayeb.com/">Blog</a>
+      </p>
+    </section>
+
+    <footer>
+      <a class="kopimi" href="#" title="Kopimi">
+        <img class="kopimi" src="./img/logo_dark.svg" title="SHTB Logo" />
+      </a>
+    </footer>
+
+    <script
+      type="module"
+      src="js/main.fucking.js"
+      type="text/javascript"
+    ></script>
+  </body>
+</html>

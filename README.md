@@ -1,0 +1,2 @@
+## Temp
+Static blog posts
