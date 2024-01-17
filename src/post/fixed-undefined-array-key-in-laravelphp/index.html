@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="author" content="Shahryar Tayeb">
+    <meta name="description" content="fixed-undefined-array-key-in-laravelphp">
+    <link rel="alternate" href="/atom.xml" type="application/atom+xml">
+    <title>How to Fix Undefined Array Key Errors in Laravel/PHP | SHTB Blog</title>
+
+    <link rel="stylesheet" type="text/css" href="../../styles/style.css" />
+
+    <!-- Icons-->
+    <link rel="apple-touch-icon" sizes="180x180" href="../../img/logo_dark.svg" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../img/logo_dark.svg"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../img/logo_dark.svg"
+    />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/js.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  </head>
+
+  <body>
+    
+
+    <main>
+    
+
+ <section>
+  
+    <h1>How to Fix Undefined Array Key Errors in Laravel/PHP</h1>
+  
+
+  <aside>
+    <p>published on 2023-08-23
+    
+    · tagged with
+      
+          <a href="/tags/backend.html">#backend</a>
+      
+      </p>
+    </aside>
+  </section>
+
+  <h2>Introduction</h2>
+<p>In PHP, undefined array key errors in PHP occur when trying to access an element in an array using a key that doesn&rsquo;t exist. This can be avoided by checking if a key exists in an array using either the isset() function or the array_key_exists() function.</p>
+<p>In this artilce we will have a look at using array_key_exists() function.</p>
+<h2>Get Started</h2>
+<p>Let&rsquo;s consider we have a model called <code>Post::class</code> and it has a generated field called banner which itself is an array with keys url and thumbnail.</p>
+<p>The catch in this situation is that we might not have a thumbnail for every post and as a result we will get <code>undefined array key</code> error.</p>
+<p>So let&rsquo;s fix it.</p>
+<h2>Solution 1 - Using  <code>array_key_exits()</code></h2>
+<p>To do that as I mentioned above we will use <code>array_key_exits()</code> function. The function takes two argument.</p>
+<ul>
+<li><code>key</code> with type of <code>string</code></li>
+<li><code>array</code> with type of <code>array</code> (This will become important later)</li>
+</ul>
+<p>and it returns a boolean.</p>
+<p>```php {12}</p>
+<p>$post = new Post([
+        &lsquo;title&rsquo; =&gt; &lsquo;My First Post&rsquo;,
+        &lsquo;body&rsquo; =&gt; &lsquo;This is the body of my first post.&rsquo;,
+        &lsquo;author&rsquo; =&gt; &lsquo;John Doe&rsquo;,
+        &lsquo;published_at&rsquo; =&gt; &lsquo;2023-08-23 10:00:00&rsquo;,
+        &lsquo;banner&rsquo; =&gt; [
+           &lsquo;url&rsquo; =&gt; &lsquo;<a href="http://localhost:8000/imgs/test.png">http://localhost:8000/imgs/test.png</a>&rsquo;,
+        ]
+]);</p>
+<p>$thumbnail = array_key_exists(&lsquo;thumbnail&rsquo;, $post-&gt;banner)
+                            ? $post-&gt;banner[&lsquo;thumbnail&rsquo;]
+                            : &lsquo;<a href="http://localhost:8000/imgs/default.png">http://localhost:8000/imgs/default.png</a>&rsquo;;</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">In</span><span class="w"> </span><span class="nt">the</span><span class="w"> </span><span class="nt">above</span><span class="w"> </span><span class="nt">code</span><span class="w"> </span><span class="nt">snippet</span><span class="w"> </span><span class="nt">we</span><span class="w"> </span><span class="nt">first</span><span class="w"> </span><span class="nt">checked</span><span class="w"> </span><span class="nt">if</span><span class="w"> </span><span class="nt">the</span><span class="w"> </span><span class="nt">key</span><span class="w"> </span><span class="nt">exists</span><span class="w"> </span><span class="nt">then</span><span class="w"> </span><span class="nt">got</span><span class="w"> </span><span class="nt">its</span><span class="w"> </span><span class="nt">value</span><span class="w"> </span><span class="nt">from</span><span class="w"> </span><span class="o">$</span><span class="nt">post</span><span class="o">,</span><span class="w"> </span><span class="nt">if</span><span class="w"> </span><span class="nt">it</span><span class="w"> </span><span class="nt">didn</span><span class="s1">&#39;t have thumbnail then return a default link.</span>
+
+<span class="s1">### Other Scenarios</span>
+
+<span class="s1">1. If you don&#39;</span><span class="nt">t</span><span class="w"> </span><span class="nt">know</span><span class="w"> </span><span class="nt">the</span><span class="w"> </span><span class="nt">array</span><span class="o">(</span><span class="err">`</span><span class="o">$</span><span class="nt">banner</span><span class="err">`</span><span class="o">)</span><span class="w"> </span><span class="nt">would</span><span class="w"> </span><span class="nt">exists</span><span class="w"> </span><span class="nt">for</span><span class="w"> </span><span class="nt">sure</span><span class="w"> </span><span class="nt">in</span><span class="w"> </span><span class="nt">the</span><span class="w"> </span><span class="nt">post</span><span class="w"> </span><span class="nt">and</span><span class="w"> </span><span class="nt">we</span><span class="w"> </span><span class="nt">use</span><span class="w"> </span><span class="nt">the</span><span class="w"> </span><span class="nt">above</span><span class="w"> </span><span class="nt">solution</span><span class="w"> </span><span class="nt">we</span><span class="w"> </span><span class="nt">will</span><span class="w"> </span><span class="nt">get</span><span class="w"> </span><span class="nt">the</span><span class="w"> </span><span class="nt">bellow</span><span class="w"> </span><span class="nt">error</span><span class="o">.</span>
+
+<span class="err">`</span><span class="nt">property</span><span class="w"> </span><span class="o">$</span><span class="nt">banner</span><span class="w"> </span><span class="nt">does</span><span class="w"> </span><span class="nt">not</span><span class="w"> </span><span class="nt">exist</span><span class="err">`</span><span class="o">,</span>
+
+<span class="nt">To</span><span class="w"> </span><span class="nt">fix</span><span class="w"> </span><span class="nt">this</span><span class="w"> </span><span class="nt">we</span><span class="w"> </span><span class="nt">need</span><span class="w"> </span><span class="nt">use</span><span class="w"> </span><span class="nt">optional</span><span class="w"> </span><span class="nt">chaining</span><span class="w"> </span><span class="nt">while</span><span class="w"> </span><span class="nt">accessing</span><span class="w"> </span><span class="nt">banner</span><span class="w"> </span><span class="nt">property</span><span class="w"> </span><span class="err">`</span><span class="o">$</span><span class="nt">post</span><span class="o">?</span><span class="nt">-</span><span class="o">&gt;</span><span class="nt">banner</span><span class="err">`</span>
+
+<span class="err">```</span><span class="nt">php</span><span class="w"> </span><span class="p">{</span><span class="err">1</span><span class="p">}</span>
+<span class="o">$</span><span class="nt">thumbnail</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">array_key_exists</span><span class="o">(</span><span class="s1">&#39;thumbnail&#39;</span><span class="o">,</span><span class="w"> </span><span class="o">$</span><span class="nt">post</span><span class="o">?</span><span class="nt">-</span><span class="o">&gt;</span><span class="nt">banner</span><span class="o">)</span>
+<span class="w">           </span><span class="o">?</span><span class="w"> </span><span class="o">$</span><span class="nt">post</span><span class="o">?</span><span class="nt">-</span><span class="o">&gt;</span><span class="nt">banner</span><span class="cp">[</span><span class="s1">&#39;thumbnail&#39;</span><span class="cp">]</span>
+<span class="w">           </span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;&lt;http://localhost:8000/imgs/default.png&gt;&#39;</span><span class="o">;</span>
+</code></pre></div>
+
+<ol>
+<li>We haved solved the <code>property $banner does not exist</code> error But if that banner property is null and it is passed to <code>array_key_exists()</code> function, we would get this next error</li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="err">`</span><span class="nx">TYPE</span><span class="w"> </span><span class="nx">ERROR</span><span class="w">  </span><span class="nx">array_key_exists</span><span class="p">():</span><span class="w"> </span><span class="nx">Argument</span><span class="w"> </span><span class="err">#</span><span class="mi">2</span><span class="w"> </span><span class="p">(</span><span class="err">$</span><span class="nx">array</span><span class="p">)</span><span class="w"> </span><span class="nx">must</span><span class="w"> </span><span class="nx">be</span><span class="w"> </span><span class="nx">of</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="nx">array</span><span class="p">,</span><span class="w"> </span><span class="nx">null</span><span class="w"> </span><span class="nx">given</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">Music</span><span class="o">/</span><span class="mi">1</span><span class="o">-</span><span class="nx">Laravel</span><span class="o">/</span><span class="nx">blog</span><span class="o">/</span><span class="nx">vendor</span><span class="o">/</span><span class="nx">psy</span><span class="o">/</span><span class="nx">psysh</span><span class="o">/</span><span class="nx">src</span><span class="o">/</span><span class="nx">Exception</span><span class="o">/</span><span class="nx">TypeErrorException</span><span class="p">.</span><span class="nx">php</span><span class="w"> </span><span class="nx">on</span><span class="w"> </span><span class="nx">line</span><span class="w"> </span><span class="mi">54</span><span class="p">.</span><span class="err">`</span>
+</code></pre></div>
+
+<p>To fix it we need to use null coalising operator.</p>
+<p>```php {1}
+array_key_exists(&lsquo;thumbnail&rsquo;, $post?-&gt;banner ?? [])
+           ? $post?-&gt;banner[&lsquo;thumbnail&rsquo;]
+           : &lsquo;<a href="http://localhost:8000/imgs/default.png">http://localhost:8000/imgs/default.png</a>&rsquo;;</p>
+<div class="codehilite"><pre><span></span><code><span class="n">Now</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n n-Quoted">`banner`</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="n">does</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">exists</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">second</span><span class="w"> </span><span class="n">parameter</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n n-Quoted">`array_key_exists()`</span><span class="w"> </span><span class="n">would</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">an</span><span class="w"> </span><span class="k">empty</span><span class="w"> </span><span class="k">array</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">we</span><span class="w"> </span><span class="n">wont</span><span class="w"> </span><span class="k">get</span><span class="w"> </span><span class="k">any</span><span class="w"> </span><span class="k">errors</span><span class="p">.</span>
+
+<span class="c1">### Final Solution 1</span>
+
+<span class="n n-Quoted">`</span><span class="n n-Quoted n-Quoted-Escape">``</span><span class="n n-Quoted">php {13-15}</span>
+<span class="n n-Quoted">namespace App\Models;</span>
+
+<span class="n n-Quoted">$post = new Post([</span>
+<span class="n n-Quoted">        &#39;title&#39; =&gt; &#39;My First Post&#39;,</span>
+<span class="n n-Quoted">        &#39;body&#39; =&gt; &#39;This is the body of my first post.&#39;,</span>
+<span class="n n-Quoted">        &#39;author&#39; =&gt; &#39;John Doe&#39;,</span>
+<span class="n n-Quoted">        &#39;published_at&#39; =&gt; &#39;2023-08-23 10:00:00&#39;,</span>
+<span class="n n-Quoted">    &#39;banner&#39; =&gt; [</span>
+<span class="n n-Quoted">       &#39;url&#39; =&gt; &#39;&lt;http://localhost:8000/imgs/test.png&gt;&#39;,</span>
+<span class="n n-Quoted">    ]</span>
+<span class="n n-Quoted">]);</span>
+
+<span class="n n-Quoted">$thumbnail = array_key_exists(&#39;thumbnail&#39;, $post?-&gt;banner ?? [])</span>
+<span class="n n-Quoted">           ? $post?-&gt;banner[&#39;thumbnail&#39;]</span>
+<span class="n n-Quoted">           : &#39;http://localhost:8000/imgs/default.png&#39;;</span>
+</code></pre></div>
+
+<h2>Solution 2 - Using Laravel Helpers <a href="https://laravel.com/docs/5.5/helpers#method-data-get">data_get()</a></h2>
+<p><code>data_get()</code> is global Laravel helper that retrieves a value from array using dot notation.</p>
+<p>It also accepts a default value in case the key is not found in the array.</p>
+<h1></h1>
+<p>data_get($array,&rsquo;array.key&rsquo;, ï¿½defaultï¿½);</p>
+<h1></h1>
+<p>```php {13}
+namespace App\Models;</p>
+<p>$post = new Post([
+        &lsquo;title&rsquo; =&gt; &lsquo;My First Post&rsquo;,
+        &lsquo;body&rsquo; =&gt; &lsquo;This is the body of my first post.&rsquo;,
+        &lsquo;author&rsquo; =&gt; &lsquo;John Doe&rsquo;,
+        &lsquo;published_at&rsquo; =&gt; &lsquo;2023-08-23 10:00:00&rsquo;,
+    &lsquo;banner&rsquo; =&gt; [
+       &lsquo;url&rsquo; =&gt; &lsquo;http://localhost:8000/imgs/test.png&rsquo;,
+    ]
+]);</p>
+<p>$thumbnail = data_get($post-&gt;banner,&rsquo;thumbnail&rsquo;,&rsquo;http://localhost:8000/imgs/default.png&rsquo;);</p>
+<p>// http://localhost:8000/imgs/default.png</p>
+<div class="codehilite"><pre><span></span><code><span class="k">With</span><span class="w"> </span><span class="n n-Quoted">`data_get()`</span><span class="w"> </span><span class="n">even</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n n-Quoted">`banner`</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">undefined</span><span class="w"> </span><span class="n">we</span><span class="w"> </span><span class="n">would</span><span class="w"> </span><span class="k">get</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="k">value</span><span class="w"> </span><span class="n">that</span><span class="w"> </span><span class="n">we</span><span class="w"> </span><span class="n">passed</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n n-Quoted">`date_get()`</span><span class="w"> </span><span class="k">function</span><span class="p">.</span>
+
+<span class="c1">## Solution 3 - Using [isset()](https://www.php.net/manual/en/function.isset.php)</span>
+
+<span class="n">issetï¿½ï¿½ï¿½Determine</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">variable</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">declared</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">different</span><span class="w"> </span><span class="n">thanï¿½</span><span class="o">**</span><span class="n n-Quoted">`null`</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="k">returns</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="kt">boolean</span><span class="p">.</span><span class="w">  </span>
+<span class="c1">#</span>
+
+<span class="o">**</span><span class="k">Description</span><span class="o">**</span>
+
+<span class="n n-Quoted">`</span><span class="n n-Quoted n-Quoted-Escape">``</span><span class="n n-Quoted">php</span>
+<span class="n n-Quoted">isset(mixed $var, mixed ...$vars): bool</span>
+</code></pre></div>
+
+<p>Here is how to handle undefined array key with <code>isset</code>  </p>
+<p>```php {13-15}
+namespace App\Models;</p>
+<p>$post = new Post([
+        &lsquo;title&rsquo; =&gt; &lsquo;My First Post&rsquo;,
+        &lsquo;body&rsquo; =&gt; &lsquo;This is the body of my first post.&rsquo;,
+        &lsquo;author&rsquo; =&gt; &lsquo;John Doe&rsquo;,
+        &lsquo;published_at&rsquo; =&gt; &lsquo;2023-08-23 10:00:00&rsquo;,
+    &lsquo;banner&rsquo; =&gt; [
+       &lsquo;url&rsquo; =&gt; &lsquo;http://localhost:8000/imgs/test.png&rsquo;,
+    ]
+]);</p>
+<p>$thumbnail = isset($post-&gt;banner[&lsquo;thumbnail&rsquo;])
+        ? $post?-&gt;banner[&lsquo;thumbnail&rsquo;]
+        : &lsquo;http://localhost:8000/imgs/default.png&rsquo;;
+```</p>
+
+
+    </main>
+
+    <br/>
+    <br/>
+
+
+    <footer>
+      <a class="kopimi" href="#" title="Kopimi">
+        <img class="kopimi" src="../../img/logo_dark.svg" title="SHTB Logo" />
+      </a>
+    </footer>
+
+    <script
+      type="module"
+      src="../../js/main.fucking.js"
+      type="text/javascript"
+    ></script>
+  </body>
+
+</html>

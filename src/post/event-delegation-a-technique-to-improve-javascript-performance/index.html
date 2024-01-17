@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="author" content="Shahryar Tayeb">
+    <meta name="description" content="event-delegation-a-technique-to-improve-javascript-performance">
+    <link rel="alternate" href="/atom.xml" type="application/atom+xml">
+    <title>Event Delegation: A Technique to Improve JavaScript Performance | SHTB Blog</title>
+
+    <link rel="stylesheet" type="text/css" href="../../styles/style.css" />
+
+    <!-- Icons-->
+    <link rel="apple-touch-icon" sizes="180x180" href="../../img/logo_dark.svg" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../img/logo_dark.svg"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../img/logo_dark.svg"
+    />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/js.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  </head>
+
+  <body>
+    
+
+    <main>
+    
+
+ <section>
+  
+    <h1>Event Delegation: A Technique to Improve JavaScript Performance</h1>
+  
+
+  <aside>
+    <p>published on 2023-10-03
+    
+    · tagged with
+      
+          <a href="/tags/backend.html">#backend</a>
+      
+      </p>
+    </aside>
+  </section>
+
+  <h2>Introduction</h2>
+<p>Let&rsquo;s start with an example. Suppose we have a navigation menu with several links, and we want to implement a smooth scrolling effect when the user clicks on any of the links. </p>
+<div class="codehilite"><pre><span></span><code><span class="p">&lt;</span><span class="nt">nav</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">ul</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav__links&quot;</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">li</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav__item&quot;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">a</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav__link&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#about&quot;</span><span class="p">&gt;</span>About<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">li</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav__item&quot;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">a</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav__link&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#projects&quot;</span><span class="p">&gt;</span>Projects<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">li</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav__item&quot;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">a</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav__link&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#testimonials&quot;</span><span class="p">&gt;</span>Testimonials<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+
+  <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<h3>A bad approach</h3>
+<p>A naive approach would be to loop over all the links and add a click event listener to each one of them, like this:</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">&#39;.nav__link&#39;</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">el</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">);</span>
+
+<span class="w">        </span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="nx">id</span><span class="p">).</span><span class="nx">scrollIntoView</span><span class="p">({</span>
+<span class="w">            </span><span class="nx">behavior</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;smooth&#39;</span>
+<span class="w">        </span><span class="p">});</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<p>This works, but it has a problem: we are adding as many event listeners as there are links, which can affect the performance and memory usage of our web page. Imagine if we have hundreds or thousands of links, that would be a lot of unnecessary event listeners!</p>
+<p>How can we solve this problem? The answer is event delegation. </p>
+<h3>A better approach</h3>
+<p>Event delegation is a technique that allows us to attach a single event listener to a common parent element, and then use the event object to determine which child element triggered the event. This way, we can handle multiple events with a single event listener, and avoid adding too many event listeners to the DOM.</p>
+<p>To implement event delegation, we need to do two things:</p>
+<ol>
+<li>Add a single event listener to the common parent element. In our case, that would be the element with the class <code>nav__links</code>.</li>
+<li>Use the event object to check which child element originated the event. In our case, we only want to handle the events that come from the elements with the class <code>nav__link</code>.</li>
+</ol>
+<p>Here is how our code would look like with event delegation:</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;.nav__links&#39;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">contains</span><span class="p">(</span><span class="s1">&#39;nav__link&#39;</span><span class="p">))</span><span class="w"> </span><span class="k">return</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">);</span>
+
+<span class="w">    </span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="nx">id</span><span class="p">).</span><span class="nx">scrollIntoView</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">behavior</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;smooth&#39;</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<ul>
+<li>The event can be triggered by any child element or the parent element itself.</li>
+<li>We are only interested in the events that come from the elements with the class <code>nav__link</code></li>
+<li>Matching strategy: we use the <code>classList</code> property of the event target to check if it contains the class <code>nav__link</code></li>
+</ul>
+<p>The matching strategy is the most important part here, make sure to adjust it to your own code.
+For example if one of our <code>nav__link</code> has more that one child, the above matching strategy wont work.</p>
+<p><code>html
+   &lt;a class="nav__link" href="#section--3"&gt;
+      &lt;span&gt;[Child]&lt;/span&gt;
+      Testimonials
+   &lt;/a&gt;</code></p>
+<p>In these cases the JavaScript selector <code>closest()</code> comes very handy</p>
+<p>```js
+    // &hellip;</p>
+<div class="codehilite"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="n">navLinkEl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">e</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">closest</span><span class="p">(</span><span class="s1">&#39;.nav__link&#39;</span><span class="p">);</span>
+
+<span class="k">const</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">navLinkEl</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">);</span>
+
+<span class="o">//</span><span class="w"> </span><span class="o">....</span>
+</code></pre></div>
+
+<p>```</p>
+<p>As you can see, we have reduced the number of event listeners from N (the number of links) to 1 (the parent element). This improves the performance and memory usage of our web page, and also makes our code more maintainable and scalable.</p>
+<h2>Conclusion</h2>
+<p>Event delegation is a powerful technique that can help us optimize our JavaScript code and handle multiple events with a single event listener. It is based on the concept of event bubbling, which means that an event that occurs on a child element will propagate up to its parent elements until it reaches the document object. By using event delegation, we can take advantage of this behavior and handle events at a higher level in the DOM hierarchy.</p>
+<p>I hope you enjoyed this blog post and learned something new about event delegation. If you have any questions or feedback, please leave a comment below. Thank you for reading!</p>
+
+
+    </main>
+
+    <br/>
+    <br/>
+
+
+    <footer>
+      <a class="kopimi" href="#" title="Kopimi">
+        <img class="kopimi" src="../../img/logo_dark.svg" title="SHTB Logo" />
+      </a>
+    </footer>
+
+    <script
+      type="module"
+      src="../../js/main.fucking.js"
+      type="text/javascript"
+    ></script>
+  </body>
+
+</html>

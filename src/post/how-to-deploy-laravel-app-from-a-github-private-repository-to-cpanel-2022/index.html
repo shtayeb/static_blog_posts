@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="author" content="Shahryar Tayeb">
+    <meta name="description" content="how-to-deploy-laravel-app-from-a-github-private-repository-to-cpanel-2022">
+    <link rel="alternate" href="/atom.xml" type="application/atom+xml">
+    <title>How to Deploy a Laravel App from a GitHub Private Repository to cPanel (2022) | SHTB Blog</title>
+
+    <link rel="stylesheet" type="text/css" href="../../styles/style.css" />
+
+    <!-- Icons-->
+    <link rel="apple-touch-icon" sizes="180x180" href="../../img/logo_dark.svg" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../img/logo_dark.svg"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../img/logo_dark.svg"
+    />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/js.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  </head>
+
+  <body>
+    
+
+    <main>
+    
+
+ <section>
+  
+    <h1>How to Deploy a Laravel App from a GitHub Private Repository to cPanel (2022)</h1>
+  
+
+  <aside>
+    <p>published on 2022-10-21
+    
+    · tagged with
+      
+          <a href="/tags/backend.html">#backend</a>
+      
+      </p>
+    </aside>
+  </section>
+
+  <h2>Introduction</h2>
+<p>So you&rsquo;ve finished developing your Laravel app and are ready to release it to the public. This article will walk you through the steps of hosting your Laravel app in cPanel from a GitHub private repository.</p>
+<h1></h1>
+<p>I decided to write about this because I was attempting to do the same thing a few weeks ago and encountered numerous issues and problems. It took a few days and a lot of reading and research for me to finish it. I decided to write about it so you wouldn&rsquo;t have to go through it.</p>
+<h2>What is covered?</h2>
+<p>In this article we will learn:</p>
+<ul>
+<li>
+<p>How to create a SSH key in cPanel</p>
+</li>
+<li>
+<p>How to add SSH key to your GitHub account</p>
+</li>
+<li>
+<p>How to create and clone a repository in cPanel</p>
+</li>
+<li>
+<p>How to modify your code to make it work for cPanel</p>
+</li>
+</ul>
+<h2>Assumptions</h2>
+<ul>
+<li>
+<p>You have terminal access to your Cpanel - If you do not have access to terminal, contact your hosting provider to request access.</p>
+</li>
+<li>
+<p>Your GitHub repository is private</p>
+</li>
+<li>
+<p>You are using a sub domain</p>
+</li>
+</ul>
+<h2>Get Started</h2>
+<p>At this point you have completed your Laravel project and uploaded the code to a GitHub repository.</p>
+<p>If you have a public repository, you can skip steps 1 to 3.</p>
+<h3>Step 1: Create ssh key using Cpanel terminal.</h3>
+<p>As I mentioned above, I have assumed that you have terminal/shell access to your cpanel account. if you can not find the terminal option in your Cpanel, contact your hosting provider and request terminal/shell access.</p>
+<ul>
+<li>Go to your terminal window in Cpanel</li>
+</ul>
+<p><img alt="Description" src="https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/1.webp"></p>
+<p>Make sure to replace <code>your_email@example.com</code> to your actual email address.</p>
+<ul>
+<li>Enter the bellow command to create ssh key pair</li>
+</ul>
+<p>```shell</p>
+<p>ssh-keygen -t ed25519 -C &ldquo;your_email@example.com&rdquo;  </p>
+<div class="codehilite"><pre><span></span><code><span class="n">You</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">prompted</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">enter</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">passcode</span><span class="w"> </span><span class="k">after</span><span class="w"> </span><span class="n">entering</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">command</span><span class="p">.</span><span class="w"> </span><span class="n">Give</span><span class="w"> </span><span class="n">your</span><span class="w"> </span><span class="n">ssh</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="k">no</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">keep</span><span class="w"> </span><span class="n">pressing</span><span class="w"> </span><span class="n">enter</span><span class="p">.</span>
+
+
+
+<span class="err">!</span><span class="o">[</span><span class="n">Description</span><span class="o">]</span><span class="p">(</span><span class="nl">https</span><span class="p">:</span><span class="o">//</span><span class="n">blog</span><span class="p">.</span><span class="n">shahryartayeb</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">uploads</span><span class="o">/</span><span class="n">blog</span><span class="o">/</span><span class="n">shahryar</span><span class="o">/</span><span class="n">cpanel</span><span class="o">-</span><span class="n">github</span><span class="o">-</span><span class="n">laravel</span><span class="o">-</span><span class="n">hosting</span><span class="o">/</span><span class="mf">2.</span><span class="n">webp</span><span class="p">)</span>
+
+
+
+<span class="err">###</span><span class="w"> </span><span class="n">Step</span><span class="w"> </span><span class="mi">2</span><span class="err">:</span><span class="w"> </span><span class="n">Authorize</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">created</span><span class="w"> </span><span class="n">ssh</span><span class="w"> </span><span class="k">key</span><span class="w"> </span>
+
+<span class="k">After</span><span class="w"> </span><span class="n">you</span><span class="s1">&#39;ve created an ssh key, you must authorize it from your account. If your key is not authorized, it will not work; this step is required to protect your account and ssh keys.</span>
+
+
+
+<span class="s1">- Go to SSH Access page in cPanel</span>
+
+
+
+<span class="s1">![Description](https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/3.webp)</span>
+
+
+
+<span class="s1">- Click on Manage SSH Keys button</span>
+
+
+
+<span class="s1">![Description](https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/4.webp)</span>
+
+
+
+<span class="s1">- In the Public Keys section, select your key and click on Manage.</span>
+
+
+
+<span class="s1">![Description](https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/5.webp)</span>
+
+<span class="s1">  In the next page click the Authorize button to authorize your ssh key. </span>
+
+
+
+<span class="s1">- Copy your public ssh key </span>
+
+
+
+<span class="s1">![Description](https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/6.webp)</span>
+
+<span class="s1">![Description](https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/7.webp)</span>
+
+<span class="s1">Now that you have created your ssh key , authorized it and copied it, It is time to add it to your GitHub account.</span>
+
+
+
+<span class="s1">### Step 3: Add your SSH key to your GitHub</span>
+
+<span class="s1">To gain access to your private GitHub repositories from Cpanel, you must first add the newly created ssh key to your account so that GitHub can verify your identity.</span>
+
+
+
+<span class="s1">- Go to your GitHub account settings -&gt; SSH and GPG Keys</span>
+
+<span class="s1">  [SSH and GPG Keys](https://github.com/settings/keys)</span>
+
+
+
+<span class="s1">- Click on New SSH Key button</span>
+
+
+
+<span class="s1">![Description](https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/8.webp)</span>
+
+<span class="s1">- In the new page give your key a name and paste the public ssh key that you copied from Cpanel in the ```Key``` section.</span>
+
+
+
+<span class="s1">![Description](https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/9.webp)</span>
+
+<span class="s1">When you are finished press Add SSH Key button.</span>
+
+
+
+<span class="s1">### Step 4: Create a repository in Cpanel</span>
+
+<span class="s1">You&#39;</span><span class="n">ve</span><span class="w"> </span><span class="n">made</span><span class="w"> </span><span class="n">an</span><span class="w"> </span><span class="n">ssh</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">linked</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">your</span><span class="w"> </span><span class="n">GitHub</span><span class="w"> </span><span class="n">account</span><span class="p">.</span><span class="w"> </span><span class="n">It</span><span class="s1">&#39;s time to set up a Cpanel repository to transfer our code from GitHub to Cpanel.</span>
+
+
+
+<span class="s1">- Get your repository clone link from GitHub</span>
+
+<span class="s1">  Go to your Laravel project repository and copy the ssh clone URL . we will need it for cloning the repository in Cpanel.</span>
+
+
+
+<span class="s1">![Description](https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/12.webp)</span>
+
+
+
+<span class="s1">- Go to ```Git Version Control``` page in Cpanel</span>
+
+
+
+<span class="s1">![Description](https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/10.webp)</span>
+
+
+
+<span class="s1">- Click on Create button</span>
+
+
+
+<span class="s1">![Description](https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/11.webp)</span>
+
+
+
+<span class="s1">- Paste your repository link in the Clone URL input field</span>
+
+
+
+<span class="s1">![Description](https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/13.webp)</span>
+
+<span class="s1">Keep the Repository Path and Repository Name as default.</span>
+
+<span class="s1">When your repository is created, it will be added in your repositories list like bellow screenshot.</span>
+
+
+
+<span class="s1">![Description](https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/14.webp)</span>
+
+
+
+<span class="s1">- To get the latest commit from your github repository click on Manage -&gt; Pull or Deploy -&gt; Update from Remote</span>
+
+
+
+<span class="s1">![Description](https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/15.webp)</span>
+
+
+
+<span class="s1">- Create a .env file in your project</span>
+
+
+
+<span class="s1">  If you have everything all the steps you will have all your project files in the repositories -&gt; your_repository_name</span>
+
+
+
+<span class="s1">  Because your project&#39;</span><span class="n">s</span><span class="p">.</span><span class="n">env</span><span class="w"> </span><span class="k">file</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">GitHub</span><span class="p">,</span><span class="w"> </span><span class="n">you</span><span class="w"> </span><span class="n">must</span><span class="w"> </span><span class="k">create</span><span class="w"> </span><span class="n">one</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">rename</span><span class="w"> </span><span class="n">the</span><span class="p">.</span><span class="n">env</span><span class="p">.</span><span class="n">example</span><span class="w"> </span><span class="k">file</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="p">.</span><span class="n">env</span><span class="p">.</span>
+
+
+
+<span class="o">&gt;</span><span class="w"> </span><span class="n">Make</span><span class="w"> </span><span class="n">sure</span><span class="w"> </span><span class="n">that</span><span class="w"> </span><span class="p">.</span><span class="n">env</span><span class="p">.</span><span class="n">example</span><span class="w"> </span><span class="k">file</span><span class="w"> </span><span class="n">does</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">contain</span><span class="w"> </span><span class="ow">any</span><span class="w"> </span><span class="k">sensitive</span><span class="w"> </span><span class="n">information</span><span class="w"> </span><span class="n">such</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">your</span><span class="w"> </span><span class="k">database</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">your</span><span class="w"> </span><span class="n">app</span><span class="w"> </span><span class="k">key</span><span class="p">.</span>
+
+
+
+
+
+<span class="err">!</span><span class="o">[</span><span class="n">Description</span><span class="o">]</span><span class="p">(</span><span class="nl">https</span><span class="p">:</span><span class="o">//</span><span class="n">blog</span><span class="p">.</span><span class="n">shahryartayeb</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">uploads</span><span class="o">/</span><span class="n">blog</span><span class="o">/</span><span class="n">shahryar</span><span class="o">/</span><span class="n">cpanel</span><span class="o">-</span><span class="n">github</span><span class="o">-</span><span class="n">laravel</span><span class="o">-</span><span class="n">hosting</span><span class="o">/</span><span class="mf">16.</span><span class="n">webp</span><span class="p">)</span>
+
+<span class="k">If</span><span class="w"> </span><span class="n">you</span><span class="w"> </span><span class="n">do</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">see</span><span class="w"> </span><span class="ow">any</span><span class="w"> </span><span class="p">.</span><span class="n">dot</span><span class="w"> </span><span class="n">files</span><span class="p">,</span><span class="w"> </span><span class="n">turn</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">Show</span><span class="w"> </span><span class="n">Hidden</span><span class="w"> </span><span class="n">Files</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">settings</span>
+
+
+
+<span class="err">!</span><span class="o">[</span><span class="n">Description</span><span class="o">]</span><span class="p">(</span><span class="nl">https</span><span class="p">:</span><span class="o">//</span><span class="n">blog</span><span class="p">.</span><span class="n">shahryartayeb</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">uploads</span><span class="o">/</span><span class="n">blog</span><span class="o">/</span><span class="n">shahryar</span><span class="o">/</span><span class="n">cpanel</span><span class="o">-</span><span class="n">github</span><span class="o">-</span><span class="n">laravel</span><span class="o">-</span><span class="n">hosting</span><span class="o">/</span><span class="mf">17.</span><span class="n">webp</span><span class="p">)</span>
+
+
+
+<span class="err">###</span><span class="w"> </span><span class="n">Step</span><span class="w"> </span><span class="mi">5</span><span class="err">:</span><span class="w"> </span><span class="n">Copy</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">your</span><span class="w"> </span><span class="n">subdomain</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="n">folder</span>
+
+<span class="k">For</span><span class="w"> </span><span class="n">security</span><span class="w"> </span><span class="n">purposes</span><span class="w"> </span><span class="n">we</span><span class="w"> </span><span class="n">should</span><span class="w"> </span><span class="k">only</span><span class="w"> </span><span class="n">put</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">Laravel</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="n">inside</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="n">subdomain</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="n">folder</span><span class="p">.</span>
+
+<span class="k">If</span><span class="w"> </span><span class="n">we</span><span class="w"> </span><span class="n">put</span><span class="w"> </span><span class="ow">all</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">our</span><span class="w"> </span><span class="n">project</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">inside</span><span class="w"> </span><span class="n">public_html</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">subdomain</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="n">folder</span><span class="p">,</span><span class="w"> </span><span class="n">we</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">exposing</span><span class="w"> </span><span class="n">our</span><span class="w"> </span><span class="p">.</span><span class="n">env</span><span class="w"> </span><span class="k">file</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">internet</span><span class="p">.</span>
+
+
+
+<span class="n">Anyone</span><span class="w"> </span><span class="n">can</span><span class="w"> </span><span class="n">access</span><span class="w"> </span><span class="n">your</span><span class="p">.</span><span class="n">env</span><span class="w"> </span><span class="k">file</span><span class="w"> </span><span class="n">via</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="ss">&quot;&#39;http://your-domain.com/.env&quot;</span><span class="s1">&#39; link and obtain sensitive information such as your database username and password, your SMTP email password,... and so on.</span>
+
+<span class="s1">![Description](https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/18.webp)</span>
+
+
+
+<span class="s1">To move the public folder, select all files inside it and click copy, then choose your main folder.</span>
+
+
+
+
+
+<span class="s1">&gt; Make sure to copy .htaccess also</span>
+
+
+
+
+
+<span class="s1">### Step 6: Edit the index.php file to point to correct project location</span>
+
+<span class="s1">After copying Laravel&#39;</span><span class="n">s</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">html</span><span class="p">,</span><span class="w"> </span><span class="n">we</span><span class="w"> </span><span class="n">must</span><span class="w"> </span><span class="n">make</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">few</span><span class="w"> </span><span class="n">changes</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="k">index</span><span class="p">.</span><span class="n">php</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">ensure</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="n">points</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">correct</span><span class="w"> </span><span class="k">path</span><span class="p">.</span>
+
+
+
+<span class="err">!</span><span class="o">[</span><span class="n">Description</span><span class="o">]</span><span class="p">(</span><span class="nl">https</span><span class="p">:</span><span class="o">//</span><span class="n">blog</span><span class="p">.</span><span class="n">shahryartayeb</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">uploads</span><span class="o">/</span><span class="n">blog</span><span class="o">/</span><span class="n">shahryar</span><span class="o">/</span><span class="n">cpanel</span><span class="o">-</span><span class="n">github</span><span class="o">-</span><span class="n">laravel</span><span class="o">-</span><span class="n">hosting</span><span class="o">/</span><span class="mf">19.</span><span class="n">webp</span><span class="p">)</span>
+
+<span class="k">Update</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">highlighted</span><span class="w"> </span><span class="n">areas</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">addresses</span><span class="w"> </span><span class="n">that</span><span class="w"> </span><span class="n">point</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">correct</span><span class="w"> </span><span class="n">files</span><span class="p">.</span>
+
+<span class="nf">Right</span><span class="w"> </span><span class="n">now</span><span class="p">,</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="n">look</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">subdomain</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">required</span><span class="w"> </span><span class="n">files</span><span class="p">,</span><span class="w"> </span><span class="n">but</span><span class="w"> </span><span class="n">those</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">exist</span><span class="w"> </span><span class="n">elsewhere</span><span class="p">.</span>
+
+<span class="ow">In</span><span class="w"> </span><span class="n">my</span><span class="w"> </span><span class="k">case</span><span class="p">,</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">addresses</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="n">look</span><span class="w"> </span><span class="ow">like</span><span class="w"> </span><span class="n">this</span><span class="p">.</span>
+
+<span class="err">```</span><span class="n">javascript</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">file_exists</span><span class="p">(</span><span class="err">$</span><span class="n">maintenance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">__DIR__</span><span class="p">.</span><span class="s1">&#39;/../repositories/simplesocial/storage/framework/maintenance.php&#39;</span><span class="p">))</span><span class="w"> </span><span class="err">{</span>
+
+<span class="w">    </span><span class="n">require</span><span class="w"> </span><span class="err">$</span><span class="n">maintenance</span><span class="p">;</span>
+
+<span class="err">}</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="nx">require</span><span class="w"> </span><span class="nx">__DIR__</span><span class="p">.</span><span class="s1">&#39;/../repositories/simplesocial/vendor/autoload.php&#39;</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="nx">$app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require_once</span><span class="w"> </span><span class="nx">__DIR__</span><span class="p">.</span><span class="s1">&#39;/../repositories/simplesocial/bootstrap/app.php&#39;</span><span class="p">;</span>
+</code></pre></div>
+
+<p>Update the addresses accordingly.</p>
+<h3>Step 7: Install the composer dependencies</h3>
+<p>After setting everything up, you need to install composer dependencies of your project.</p>
+<ul>
+<li>
+<p>Go to Terminal </p>
+</li>
+<li>
+<p>Navigate to your repository <code>cd repositories/simplesocial</code></p>
+</li>
+<li>
+<p>Run <code>composer update</code> and  <code>composer install</code> </p>
+</li>
+</ul>
+<p><img alt="Description" src="https://blog.shahryartayeb.com/uploads/blog/shahryar/cpanel-github-laravel-hosting/20.webp"></p>
+<p>After the installation is done, your project will be up and running and accessible to everyone.</p>
+<h3>Step 8: Apply new changes to your project</h3>
+<p>To get the latest commit from your github repository go to Git Version Control -&gt; Manage -&gt; Pull or Deploy -&gt; Update from Remote</p>
+<blockquote>
+<p>If you have new changes to the frontend of your project like changes in JavaScript or Vue, you have to manually upload it to the subdomain folder for your changes to get effect.</p>
+</blockquote>
+<h2>Summary</h2>
+<p>To host your Laravel Project in cPanel with GitHub follow these 8 steps</p>
+<ol>
+<li>
+<p>Create SSH key using cPanel terminal.</p>
+</li>
+<li>
+<p>Authorize the created SSK Key</p>
+</li>
+<li>
+<p>Add your SSH key to your GitHub</p>
+</li>
+<li>
+<p>Create a repository in cPanel</p>
+</li>
+<li>
+<p>Copy the public folder to your subdomain main folder</p>
+</li>
+<li>
+<p>Edit the index.php file to point to correct project location</p>
+</li>
+<li>
+<p>Install the composer dependencies</p>
+</li>
+<li>
+<p>Apply future changes to your project</p>
+</li>
+</ol>
+<h2></h2>
+<h4>Related Article</h4>
+<p><a href="https://blog.shahryartayeb.com/post/how-to-change-the-default-public-folder-path-in-laravel-and-upload-files-to-it-for-cpanel-deployment">How to change the default public folder path in Laravel and upload files to it for cPanel deployment</a></p>
+
+
+    </main>
+
+    <br/>
+    <br/>
+
+
+    <footer>
+      <a class="kopimi" href="#" title="Kopimi">
+        <img class="kopimi" src="../../img/logo_dark.svg" title="SHTB Logo" />
+      </a>
+    </footer>
+
+    <script
+      type="module"
+      src="../../js/main.fucking.js"
+      type="text/javascript"
+    ></script>
+  </body>
+
+</html>

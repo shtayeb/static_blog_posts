@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="author" content="Shahryar Tayeb">
+    <meta name="description" content="customizing-default-uiavatars-in-laravel-jetstream">
+    <link rel="alternate" href="/atom.xml" type="application/atom+xml">
+    <title>Customizing the default ui-avatars in Laravel Jetstream | SHTB Blog</title>
+
+    <link rel="stylesheet" type="text/css" href="../../styles/style.css" />
+
+    <!-- Icons-->
+    <link rel="apple-touch-icon" sizes="180x180" href="../../img/logo_dark.svg" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../img/logo_dark.svg"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../img/logo_dark.svg"
+    />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/js.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  </head>
+
+  <body>
+    
+
+    <main>
+    
+
+ <section>
+  
+    <h1>Customizing the default ui-avatars in Laravel Jetstream</h1>
+  
+
+  <aside>
+    <p>published on 2023-04-17
+    
+    · tagged with
+      
+          <a href="/tags/backend.html">#backend</a>
+      
+      </p>
+    </aside>
+  </section>
+
+  <h2>Introduction</h2>
+<h3>Laravel Jetstream</h3>
+<p>Laravel Jetstream is a beautifully designed application starter kit for Laravel and provides the perfect starting point for your next Laravel application. Jetstream provides the implementation for your application&rsquo;s login, registration, email verification, two-factor authentication, session management, API viaï¿½<strong><a href="https://github.com/laravel/sanctum">Laravel Sanctum</a></strong>, and optional team management features.</p>
+<h1></h1>
+<p>Jetstream is designed usingï¿½<strong><a href="https://tailwindcss.com/">Tailwind CSS</a></strong>ï¿½and offers your choice ofï¿½<strong><a href="https://jetstream.laravel.com/3.x/stacks/livewire.html">Livewire</a></strong>ï¿½orï¿½<strong><a href="https://jetstream.laravel.com/3.x/stacks/inertia.html">Inertia</a></strong>ï¿½scaffolding.</p>
+<h1></h1>
+<p><a href="http://jetstream.laravel.com">Read More</a></p>
+<h1></h1>
+<h2>Let&rsquo;s Begin</h2>
+<h1></h1>
+<h3>Enable Profile Photos Feature</h3>
+<p>Jetstream is highly customizable, you can acitivate/deactivate any feature that you want. By default the profile photo management is disabled in Jetstream.</p>
+<h1></h1>
+<p>To Enable profile photo feature for Jetstream open <code>config/jetstream.php</code> config file and uncomment <code>Features::profilePhotos()</code> .</p>
+<div class="codehilite"><pre><span></span><code><span class="x">// config/jetstream.php</span>
+
+<span class="x">&#39;features&#39; =&gt; [</span>
+<span class="x">  // Features::termsAndPrivacyPolicy(),</span>
+<span class="x">  Features::profilePhotos(),</span>
+<span class="x">  // Features::api(),</span>
+<span class="x">  Features::teams([&#39;invitations&#39; =&gt; true]),</span>
+<span class="x">  Features::accountDeletion(),</span>
+<span class="x">],</span>
+</code></pre></div>
+
+<p>After enabling profile photo feature. In case the user hasn&rsquo;t uploaded a custom profile photo we will get a ui-avatar with the user initials.</p>
+<h1></h1>
+<p><img alt="desc" src="https://blog.shahryartayeb.com/uploads/42/untitled-(2).png"></p>
+<h1></h1>
+<p>To change this lets see how Jetstream implements it.</p>
+<h1></h1>
+<h3>How it works</h3>
+<p>go to <code>User.php</code> </p>
+<div class="codehilite"><pre><span></span><code><span class="x">use Laravel\Jetstream\HasProfilePhoto;</span>
+<span class="x">...</span>
+<span class="x">...</span>
+
+<span class="x">class User extends Authenticatable</span>
+<span class="x">{</span>
+<span class="x">    ...</span>
+<span class="x">        ...</span>
+<span class="x">    use HasProfilePhoto;</span>
+<span class="x">    ...</span>
+<span class="x">        ...</span>
+<span class="x">}</span>
+</code></pre></div>
+
+<p>Jetstream has a trait so lets take a look at it.</p>
+<div class="codehilite"><pre><span></span><code><span class="x">// vendor/laravel/jetstream/src/HasProfilePhoto.php</span>
+
+<span class="x">trait HasProfilePhoto</span>
+<span class="x">{</span>
+<span class="x">        ....</span>
+
+<span class="x">        /**</span>
+<span class="x">     * Get the URL to the user&#39;s profile photo.</span>
+<span class="x">     *</span>
+<span class="x">     * @return \Illuminate\Database\Eloquent\Casts\Attribute</span>
+<span class="x">     */</span>
+<span class="x">    public function profilePhotoUrl(): Attribute</span>
+<span class="x">    {</span>
+<span class="x">        return Attribute::get(function () {</span>
+<span class="x">            return $this-&gt;profile_photo_path</span>
+<span class="x">                    ? Storage::disk($this-&gt;profilePhotoDisk())-&gt;url($this-&gt;profile_photo_path)</span>
+<span class="x">                    : $this-&gt;defaultProfilePhotoUrl();</span>
+<span class="x">        });</span>
+<span class="x">    }</span>
+
+<span class="x">    /**</span>
+<span class="x">     * Get the default profile photo URL if no profile photo has been uploaded.</span>
+<span class="x">     *</span>
+<span class="x">     * @return string</span>
+<span class="x">     */</span>
+<span class="x">    protected function defaultProfilePhotoUrl()</span>
+<span class="x">    {</span>
+<span class="x">        $name = trim(collect(explode(&#39; &#39;, $this-&gt;name))-&gt;map(function ($segment) {</span>
+<span class="x">            return mb_substr($segment, 0, 1);</span>
+<span class="x">        })-&gt;join(&#39; &#39;));</span>
+
+<span class="x">        return &#39;https://ui-avatars.com/api/?name=&#39;.urlencode($name).&#39;&amp;color=7F9CF5&amp;background=EBF4FF&#39;;</span>
+<span class="x">    }</span>
+
+<span class="x">}</span>
+</code></pre></div>
+
+<p>Letï¿½s focus on the above two methods.</p>
+<h1></h1>
+<p><code>profilePhotoUrl()</code> is an accessor and it checks if the user has uploaded a profile photo . if not, it gets a default avatar url for it using the <code>defaultProfilePhotoUrl()</code> method.</p>
+<h1></h1>
+<h3>Customize</h3>
+<p>That is exactly what we are looking for, so to override that method, copy it and paste it in your <code>User.php</code> model</p>
+<div class="codehilite"><pre><span></span><code><span class="x">// App/Models/User.php</span>
+
+
+
+<span class="x">// jetstream overwritten method</span>
+<span class="x">protected function defaultProfilePhotoUrl()</span>
+<span class="x">{</span>
+<span class="x">    $name = trim(</span>
+<span class="x">        collect(explode(&#39; &#39;, $this-&gt;name))</span>
+<span class="x">            -&gt;map(function ($segment) {</span>
+<span class="x">                return mb_substr($segment, 0, 1);</span>
+<span class="x">            })</span>
+<span class="x">            -&gt;join(&#39; &#39;),</span>
+<span class="x">    );</span>
+
+<span class="x">    return &#39;https://ui-avatars.com/api/?name=&#39;.urlencode($name).&#39;&amp;color=7F9CF5&amp;background=EBF4FF&#39;;</span>
+<span class="x">}</span>
+</code></pre></div>
+
+<h1></h1>
+<p>The <code>defaultProfilePhotoUrl()</code> method returns the default avatar url using <code>https://ui-avatars.com/ ****</code>services.</p>
+<h1></h1>
+<p>but we will be swapping it with a new service called <a href="https://www.dicebear.com/">https://www.dicebear.com/</a> </p>
+<h1></h1>
+<p>it has a variety of avatar collection you can choose from. I will be using the <code>bottts</code> but you can customize it as you like.</p>
+<h1></h1>
+<p>```php
+// App/Models/User.php</p>
+<p>// jetstream overwritten method
+protected function defaultProfilePhotoUrl()
+{
+    $name = trim(
+        collect(explode(&rsquo; &lsquo;, $this-&gt;name))
+            -&gt;map(function ($segment) {
+                return mb_substr($segment, 0, 1);
+            })
+            -&gt;join(&rsquo; &lsquo;),
+    );</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">return</span><span class="w"> </span><span class="s1">&#39;https://avatars.dicebear.com/api/bottts/&#39;</span><span class="w"> </span><span class="o">.</span>
+<span class="w">        </span><span class="nt">urlencode</span><span class="o">($</span><span class="nt">name</span><span class="o">)</span><span class="w"> </span><span class="o">.</span>
+<span class="w">        </span><span class="s1">&#39;.svg&#39;</span><span class="o">;</span>
+</code></pre></div>
+
+<p>}
+ ```
+The result will look something like this</p>
+<h1></h1>
+<p><img alt="desc" src="https://blog.shahryartayeb.com/uploads/41/untitled-(1).png"></p>
+<h1></h1>
+<h2>Conclusion</h2>
+<p>To customze any of jetstream functionalities you just have to create the same method in your User model and Jetstream will user your customized method in the future.</p>
+
+
+    </main>
+
+    <br/>
+    <br/>
+
+
+    <footer>
+      <a class="kopimi" href="#" title="Kopimi">
+        <img class="kopimi" src="../../img/logo_dark.svg" title="SHTB Logo" />
+      </a>
+    </footer>
+
+    <script
+      type="module"
+      src="../../js/main.fucking.js"
+      type="text/javascript"
+    ></script>
+  </body>
+
+</html>

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="author" content="Shahryar Tayeb">
+    <meta name="description" content="how-to-implement-infinite-scroll-effect-in-react-native-with-laravel-api">
+    <link rel="alternate" href="/atom.xml" type="application/atom+xml">
+    <title>How to implement infinite Scroll effect in React Native with Laravel API | SHTB Blog</title>
+
+    <link rel="stylesheet" type="text/css" href="../../styles/style.css" />
+
+    <!-- Icons-->
+    <link rel="apple-touch-icon" sizes="180x180" href="../../img/logo_dark.svg" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../img/logo_dark.svg"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../img/logo_dark.svg"
+    />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/js.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  </head>
+
+  <body>
+    
+
+    <main>
+    
+
+ <section>
+  
+    <h1>How to implement infinite Scroll effect in React Native with Laravel API</h1>
+  
+
+  <aside>
+    <p>published on 2022-10-18
+    
+    · tagged with
+      
+          <a href="/tags/backend.html">#backend</a>
+      
+      </p>
+    </aside>
+  </section>
+
+  <h2>Introduction</h2>
+<p>Infinite Scrolling is a feature that allows you to load more data when the user scrolls to the bottom of the list. It is a great way to add more content to your app without having to make additional API calls.</p>
+<p>Benefit of this technique is that we don&rsquo;t all of our data at once , we only get our data when the user needs it this will allow our app to have faster load time which is very essential for our App.</p>
+<p>In this tutorial I have assumed that you have already installed the React Native CLI or Expo and have installed and set up Laravel and its dependencies. You have a table in your database which has the data of your app and you have a Route which is responsible for fetching the data from the database.</p>
+<h2>Letï¿½s Get Started</h2>
+<h3>Laravel Backend</h3>
+<p>Let&rsquo;s start with our API. As you see I have a table called article which has some articles stored in it. Bellow is the route that is responsible for fetching the data from the database.</p>
+<div class="codehilite"><pre><span></span><code><span class="x">Route::get(&quot;/get-articles&quot;,[ArticlesController::class,&#39;getArticlesApi&#39;]);</span>
+</code></pre></div>
+
+<p>Now we have our API route which is responsible for fetching the data. In ourï¿½<strong><code>ArticlesController.php</code></strong> we have a method called <strong><code>getArticlesApi</code></strong> which is as bellow.</p>
+<div class="codehilite"><pre><span></span><code><span class="cp">&lt;?php</span>
+
+
+
+<span class="k">namespace</span> <span class="nx">App\Http\Controllers</span><span class="p">;</span>
+
+
+
+<span class="k">use</span> <span class="nx">App\Models\Article</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Illuminate\Http\Request</span><span class="p">;</span>
+
+
+
+<span class="k">class</span> <span class="nc">ArticlesController</span> <span class="k">extends</span> <span class="nx">Controller</span>
+
+<span class="p">{</span>
+
+    <span class="o">...</span>
+
+    <span class="o">...</span>
+
+
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getArticlesApi</span><span class="p">()</span>
+
+    <span class="p">{</span>
+
+        <span class="nv">$articles</span> <span class="o">=</span> <span class="nx">Article</span><span class="o">::</span><span class="na">orderBy</span><span class="p">(</span><span class="s1">&#39;created_at&#39;</span><span class="p">,</span> <span class="s1">&#39;DESC&#39;</span><span class="p">)</span>
+
+                                                        <span class="o">-&gt;</span><span class="na">with</span><span class="p">(</span><span class="s2">&quot;website:id,title&quot;</span><span class="p">)</span>
+
+                                                        <span class="o">-&gt;</span><span class="na">paginate</span><span class="p">(</span><span class="mi">6</span><span class="p">);</span>
+
+
+
+        <span class="k">return</span> <span class="nx">response</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">json</span><span class="p">([</span><span class="s1">&#39;status&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;articles&#39;</span> <span class="o">=&gt;</span> <span class="nv">$articles</span><span class="p">]);</span>
+
+    <span class="p">}</span>
+
+
+
+    <span class="o">...</span>
+
+    <span class="o">...</span>
+
+<span class="p">}</span>
+</code></pre></div>
+
+<p>To Explain the above code.</p>
+<ul>
+<li>
+<p>The <strong><code>orderBy('created_at', 'DESC')</code></strong> is used to sort the data in descending order to get the latest articles first.</p>
+</li>
+<li>
+<p>The <strong><code>with("website:id,title")</code></strong> is used to get the website title of the article from a separate table using eager loading which is a feature of Eloquent.</p>
+</li>
+<li>
+<p>The **<code>paginate(6**)</code> is used to get the data in chunks of 6.</p>
+</li>
+</ul>
+<p>The <strong><code>paginate(6)</code></strong> is very important because we are using the infinite scrolling feature and we don&rsquo;t want to load all the data at once. The paginate method will provide us with the data in chunks of 6 and also links to get the rest of our data when we scroll to the bottom of the list.</p>
+<p>Now we have our API route which is responsible for fetching the data. In our <strong><code>ArticlesController.php</code></strong> we have a method called <strong><code>getArticlesApi()</code></strong> to get the data.</p>
+<p>If you have done everything correctly then you should see the data in the response. The data will be something like this:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+
+<span class="w">  </span><span class="s2">&quot;status&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+
+<span class="w">  </span><span class="s2">&quot;articles&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="s2">&quot;current_page&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;data&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+
+<span class="w">      </span><span class="p">{</span>
+
+<span class="w">        </span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">150</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;title&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;First Mover Asia: Bitcoin Falls in Pre-Holiday Trading;&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;excerpt&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;A recovery in the Tether-Chinese yuan pairing&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;image&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;category_id&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;website_id&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;created_at&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;2021-11-25T04:05:16.000000Z&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;updated_at&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;2021-11-25T04:06:00.000000Z&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;slug&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;first-mover-asia-bitcoin-falls-in-pre-holiday-trading-ether-drops&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;website&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;title&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Yahoo Finance&quot;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">      </span><span class="p">},</span>
+
+<span class="w">      </span><span class="p">{</span>
+
+<span class="w">        </span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">151</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;title&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;US regulators aim for greater legal &quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;excerpt&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;US banking regulators have shared their .&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;image&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;category_id&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;website_id&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;created_at&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;2021-11-25T04:05:16.000000Z&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;updated_at&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;2021-11-25T04:05:16.000000Z&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;slug&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;us-regulators-aim-for-greater-legal-&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;website&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;title&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Yahoo Finance&quot;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">      </span><span class="p">},</span>
+
+<span class="w">     </span><span class="p">.....</span>
+
+<span class="w">    </span><span class="p">],</span>
+
+<span class="w">    </span><span class="s2">&quot;first_page_url&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://localhost:8000/api/get-articles?page=1&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;from&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;last_page&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">20</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;last_page_url&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://localhost:8000/api/get-articles?page=20&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;links&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+
+<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;url&quot;</span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;label&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;ï¿½ Previous&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">},</span>
+
+<span class="w">      </span><span class="p">{</span>
+
+<span class="w">        </span><span class="s2">&quot;url&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://localhost:8000/api/get-articles?page=1&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;label&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;active&quot;</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span>
+
+<span class="w">      </span><span class="p">},</span>
+
+<span class="w">      </span><span class="p">{</span>
+
+<span class="w">        </span><span class="s2">&quot;url&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://localhost:8000/api/get-articles?page=2&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;label&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;2&quot;</span><span class="p">,</span>
+
+<span class="w">        </span><span class="s2">&quot;active&quot;</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span>
+
+<span class="w">      </span><span class="p">}</span>
+
+<span class="w">    </span><span class="p">],</span>
+
+<span class="w">    </span><span class="s2">&quot;next_page_url&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://localhost:8000/api/get-articles?page=2&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;path&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://localhost:8000/api/get-articles&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;per_page&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">6</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;prev_page_url&quot;</span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;to&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">6</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;total&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">119</span>
+
+<span class="w">  </span><span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div>
+
+<p>To analyze the response,</p>
+<ul>
+<li>
+<p>We can use the <strong><code>response.data</code></strong> property to access the data.</p>
+</li>
+<li>
+<p>The Important thing that we need here is <strong><code>next_page_url</code></strong> using this link we can get the next page of data and we will get the same response with 6 new articles in the response and if the data is remaining then we will get a new <strong><code>next_page_url</code></strong>.</p>
+</li>
+</ul>
+<p>Since our backend is fully functional and we have the data we can now start to build the frontend and move to React Native.</p>
+<h3>Frontend React Native</h3>
+<p>For React Native, I have assumed the you have a working project and installed all the dependencies including <strong><code>axios</code></strong> which is used to make the API calls.</p>
+<p>In our React Native we will have function to get data from the API which will be something like this:</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">news</span><span class="p">,</span><span class="w"> </span><span class="nx">setNews</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">nextPageUrl</span><span class="p">,</span><span class="w"> </span><span class="nx">setNextPageUrl</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">isLoading</span><span class="p">,</span><span class="w"> </span><span class="nx">setIsLoading</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+
+
+
+<span class="nx">useEffect</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nx">getData</span><span class="p">();</span>
+
+<span class="p">},</span><span class="w"> </span><span class="p">[]);</span>
+
+
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">getData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nx">API</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;https://localhost:8000/api/get-articles&quot;</span><span class="p">)</span>
+
+<span class="w">    </span><span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">            </span><span class="nx">setNews</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">articles</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+
+<span class="w">            </span><span class="nx">setNextPageUrl</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">articles</span><span class="p">.</span><span class="nx">next_page_url</span><span class="p">);</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">isLoading</span><span class="p">)</span><span class="w"> </span><span class="nx">setIsLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+<span class="w">    </span><span class="p">}).</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">            </span><span class="c1">// console.log(err.message);</span>
+
+<span class="w">            </span><span class="nx">setErrMsg</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">isLoading</span><span class="p">)</span><span class="w"> </span><span class="nx">setIsLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+<span class="w">    </span><span class="p">});</span>
+
+<span class="p">};</span>
+</code></pre></div>
+
+<p>When we get the data in <strong><code>then()</code></strong> we will set the state of <strong><code>news</code></strong> and <strong><code>nextPageUrl</code></strong>.</p>
+<p>The <strong><code>news</code></strong> is our 6 articles which we got from the API and the <strong><code>nextPageUrl</code></strong> is the link to the next page of data.</p>
+<p>The <strong><code>isLoading</code></strong> is a Boolean which we will use to show the loading spinner.</p>
+<p>To display the data we will use the FlatList component which is a list of items.</p>
+<p>I won&rsquo;t bore you with the details of how to use the FlatList component. Since if your are looking for infinite scrolling, you can use the FlatList component.</p>
+<p>The part of the Flatlist that we are interested in is the <strong><code>onEndReached</code></strong> and <strong><code>onEndReachedThreshold</code></strong> property of the Flatlist.</p>
+<p><strong><code>onEndReached</code></strong> gets a function which will be called when the user scrolls to the end of the list or scroll past the <strong><code>onEndReachedThreshold</code></strong> property.</p>
+<p><strong><code>onEndReachedThreshold</code></strong> is a number between 0 and 1 which is the fraction of the list that has been scrolled before <strong><code>onEndReached</code></strong> is called.</p>
+<div class="codehilite"><pre><span></span><code><span class="p">...</span>
+
+
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span>
+
+<span class="w">        </span><span class="o">&lt;</span><span class="nx">FlatList</span>
+
+<span class="w">            </span><span class="nx">onEndReached</span><span class="o">=</span><span class="p">{</span><span class="nx">getNextPageData</span><span class="p">}</span>
+
+<span class="w">            </span><span class="nx">onEndReachedThreshold</span><span class="o">=</span><span class="p">{</span><span class="mf">0.5</span><span class="p">}</span>
+
+<span class="w">            </span><span class="p">...</span>
+
+
+
+<span class="w">        </span><span class="o">&gt;</span>
+
+
+
+<span class="w">    </span><span class="p">);</span>
+
+
+
+<span class="p">...</span>
+</code></pre></div>
+
+<p>The <strong><code>onEndReached</code></strong> will call the <strong><code>getNextPageData()</code></strong> function when the user scrolls to the end of the list.</p>
+<p>The <code>getNextPageData</code> function will be something like this:</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">loadingMore</span><span class="p">,</span><span class="w"> </span><span class="nx">setLoadingMore</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">getNextPageData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// we check if the nextPageUrl state is not null</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">nextPageUrl</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">            </span><span class="c1">// is a flag to show or hide the loading spinner at the bottom of the list</span>
+
+<span class="w">            </span><span class="nx">setLoadingMore</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+
+<span class="w">            </span><span class="nx">axios</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">nextPageUrl</span><span class="p">)</span>
+
+<span class="w">                </span><span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">                </span><span class="nx">setNews</span><span class="p">([...</span><span class="nx">news</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">res</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">articles</span><span class="p">.</span><span class="nx">data</span><span class="p">]);</span>
+
+<span class="w">                </span><span class="nx">setNextPageUrl</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">articles</span><span class="p">.</span><span class="nx">next_page_url</span><span class="p">);</span>
+
+<span class="w">                </span><span class="c1">// we use the if(loadingMore) to avoid unnecessary setting of the state.</span>
+
+<span class="w">                </span><span class="c1">// this will assure that we only change state when it necessary</span>
+
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="nx">loadingMore</span><span class="p">)</span><span class="w"> </span><span class="nx">setLoadingMore</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+<span class="w">                </span><span class="p">})</span>
+
+<span class="w">                </span><span class="p">.</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">                </span><span class="nx">setLoadingMore</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+<span class="w">                </span><span class="nx">setErrMsg</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+
+<span class="w">                </span><span class="p">});</span>
+
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">            </span><span class="nx">setErrMsg</span><span class="p">(</span><span class="s2">&quot;No more data&quot;</span><span class="p">);</span>
+
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">    </span><span class="p">};</span>
+</code></pre></div>
+
+<p>The <strong><code>getNextPageData</code></strong> function will call the <strong><code>axios.get</code></strong> function to get the next page of data.</p>
+<p>but first we check that the existing <strong><code>nextPageUrl</code></strong> is not null because if is it null then we don&rsquo;t have any other data to get and we wont call the API.</p>
+<p>If our request is successful we will get 6 new articles and a new <strong><code>nextPageUrl</code></strong> from the API which we need store in the state.</p>
+<p>Since we don&rsquo;t want to lose our previous data we will use the spread operator like bellow:</p>
+<div class="codehilite"><pre><span></span><code><span class="nx">setNews</span><span class="p">([...</span><span class="nx">news</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">res</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">articles</span><span class="p">.</span><span class="nx">data</span><span class="p">]);</span>
+</code></pre></div>
+
+<p>To add the new data to the existing data. The new data will be appended at the bottom of the list which is what we want.</p>
+<p>We will also set the <strong><code>loadingMore</code></strong> flag to false to hide the loading spinner. and finally we set the <strong><code>nextPageUrl</code></strong> to the new value which we got from the API.</p>
+<p>in here if there is no more data left in the database the <strong><code>nextPageUrl</code></strong> will be null, this is helping because at the beginning of this function we checked for the <strong><code>nextPageUrl</code></strong> to not be null.</p>
+<p>To summarize what we have done in React Native is:</p>
+<ul>
+<li>
+<p>Get the data from the API</p>
+</li>
+<li>
+<p>Get the <strong><code>next_page_url</code></strong> and store it in a State Variable</p>
+</li>
+<li>
+<p>Define the <strong><code>getNextPageData</code></strong> function</p>
+</li>
+<li>
+<p>Set <strong><code>onEndReached</code></strong> and <strong><code>onEndReachedThreshold</code></strong> for the FlatList</p>
+</li>
+</ul>
+<div class="codehilite"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nx">React</span><span class="w"> </span><span class="p">,{</span><span class="nx">useState</span><span class="p">,</span><span class="nx">useEffect</span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;react&quot;</span><span class="p">;</span>
+
+<span class="k">import</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">  </span><span class="nx">ActivityIndicator</span><span class="p">,</span>
+
+<span class="w">  </span><span class="nx">FlatList</span><span class="p">,</span>
+
+<span class="w">  </span><span class="nx">Image</span><span class="p">,</span>
+
+<span class="w">  </span><span class="nx">StyleSheet</span><span class="p">,</span>
+
+<span class="w">  </span><span class="nx">Text</span><span class="p">,</span>
+
+<span class="w">  </span><span class="nx">TouchableOpacity</span><span class="p">,</span>
+
+<span class="w">  </span><span class="nx">View</span><span class="p">,</span>
+
+<span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;react-native&quot;</span><span class="p">;</span>
+
+<span class="k">import</span><span class="w"> </span><span class="nx">SkeletonContent</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;react-native-skeleton-content&quot;</span><span class="p">;</span>
+
+<span class="k">import</span><span class="w"> </span><span class="nx">axios</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;axios&quot;</span><span class="p">;</span>
+
+
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">News</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">isDarkTheme</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">news</span><span class="p">,</span><span class="w"> </span><span class="nx">setNews</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">nextPageUrl</span><span class="p">,</span><span class="w"> </span><span class="nx">setNextPageUrl</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">loadingMore</span><span class="p">,</span><span class="w"> </span><span class="nx">setLoadingMore</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">errMsg</span><span class="p">,</span><span class="w"> </span><span class="nx">setErrMsg</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">isLoading</span><span class="p">,</span><span class="w"> </span><span class="nx">setIsLoading</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+
+
+
+<span class="w">    </span><span class="nx">useEffect</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// 1- Get the data from the API</span>
+
+<span class="w">            </span><span class="nx">getData</span><span class="p">();</span>
+
+<span class="w">    </span><span class="p">},</span><span class="w"> </span><span class="p">[]);</span>
+
+
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">getData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="nx">API</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;https://localhost:8000/api/get-articles&quot;</span><span class="p">)</span>
+
+<span class="w">        </span><span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">            </span><span class="nx">setNews</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">articles</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+
+<span class="w">            </span><span class="c1">// 2- Get the next_page_url and store it in a State Variable</span>
+
+<span class="w">                </span><span class="nx">setNextPageUrl</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">articles</span><span class="p">.</span><span class="nx">next_page_url</span><span class="p">);</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">refreshing</span><span class="p">)</span><span class="w"> </span><span class="nx">setRefreshing</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">isLoading</span><span class="p">)</span><span class="w"> </span><span class="nx">setIsLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+<span class="w">        </span><span class="p">})</span>
+
+<span class="w">        </span><span class="p">.</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">            </span><span class="c1">// console.log(err.message);</span>
+
+<span class="w">            </span><span class="nx">setErrMsg</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">refreshing</span><span class="p">)</span><span class="w"> </span><span class="nx">setRefreshing</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">isLoading</span><span class="p">)</span><span class="w"> </span><span class="nx">setIsLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+<span class="w">        </span><span class="p">});</span>
+
+<span class="w">    </span><span class="p">};</span>
+
+
+
+<span class="w">    </span><span class="c1">// 4- define the getNextPageData function</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">getNextPageData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// we check if the nextPageUrl state is not null</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">nextPageUrl</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">            </span><span class="c1">// is a flag to show or hide the loading spinner at the bottom of the list</span>
+
+<span class="w">            </span><span class="nx">setLoadingMore</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+
+<span class="w">            </span><span class="nx">axios</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">nextPageUrl</span><span class="p">)</span>
+
+<span class="w">                </span><span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">                </span><span class="nx">setNews</span><span class="p">([...</span><span class="nx">news</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">res</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">articles</span><span class="p">.</span><span class="nx">data</span><span class="p">]);</span>
+
+<span class="w">                </span><span class="nx">setNextPageUrl</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">articles</span><span class="p">.</span><span class="nx">next_page_url</span><span class="p">);</span>
+
+<span class="w">                </span><span class="c1">// we use the if(loadingMore) to avoid unnecessary setting of the state.</span>
+
+<span class="w">                </span><span class="c1">// this will assure that we only change state when it necessary</span>
+
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="nx">loadingMore</span><span class="p">)</span><span class="w"> </span><span class="nx">setLoadingMore</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+<span class="w">                </span><span class="p">})</span>
+
+<span class="w">                </span><span class="p">.</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">                </span><span class="nx">setLoadingMore</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+<span class="w">                </span><span class="nx">setErrMsg</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+
+<span class="w">                </span><span class="p">});</span>
+
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">            </span><span class="nx">setErrMsg</span><span class="p">(</span><span class="s2">&quot;No more data&quot;</span><span class="p">);</span>
+
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">    </span><span class="p">};</span>
+
+
+
+
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nx">isLoading</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span>
+
+<span class="w">        </span><span class="p">...</span>
+
+<span class="w">    </span><span class="p">)</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+
+
+
+
+<span class="w">    </span><span class="c1">// 3- set onEndReached and onEndReachedThreshold for the FlatList</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span>
+
+<span class="w">    </span><span class="o">&lt;</span><span class="nx">FlatList</span>
+
+
+
+<span class="w">      </span><span class="nx">onEndReached</span><span class="o">=</span><span class="p">{</span><span class="nx">getNextPageData</span><span class="p">}</span>
+
+<span class="w">      </span><span class="nx">onEndReachedThreshold</span><span class="o">=</span><span class="p">{</span><span class="mf">0.5</span><span class="p">}</span>
+
+<span class="w">      </span><span class="nx">data</span><span class="o">=</span><span class="p">{</span><span class="nx">news</span><span class="p">}</span>
+
+<span class="w">      </span><span class="nx">keyExtractor</span><span class="o">=</span><span class="p">{(</span><span class="nx">item</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">item</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">}</span>
+
+<span class="w">      </span><span class="nx">renderItem</span><span class="o">=</span><span class="p">{({</span><span class="w"> </span><span class="nx">item</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span>
+
+<span class="w">          </span><span class="p">...</span>
+
+<span class="w">        </span><span class="p">);</span>
+
+<span class="w">      </span><span class="p">}}</span>
+
+<span class="w">    </span><span class="o">/&gt;</span>
+
+<span class="w">  </span><span class="p">);</span>
+
+
+
+<span class="p">}</span>
+</code></pre></div>
+
+<p>That was all about infinite scrolling in React Native and Laravel to get you started with the topic. Obviously you can use the same code in React Native or React JS. You can do a lot more with the data taken from the API and implement it in your project or add new features to it.</p>
+<p>I hope this has helped you to understand how to use the API in your project. thanks for reading. Don&rsquo;t forget to share this article with your friends.</p>
+<p><strong>See it in actions:</strong></p>
+<div class="embed-youtube" >
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/93HHDl0oRAU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+</div>
+
+
+    </main>
+
+    <br/>
+    <br/>
+
+
+    <footer>
+      <a class="kopimi" href="#" title="Kopimi">
+        <img class="kopimi" src="../../img/logo_dark.svg" title="SHTB Logo" />
+      </a>
+    </footer>
+
+    <script
+      type="module"
+      src="../../js/main.fucking.js"
+      type="text/javascript"
+    ></script>
+  </body>
+
+</html>

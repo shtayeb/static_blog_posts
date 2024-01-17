@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="author" content="Shahryar Tayeb">
+    <meta name="description" content="crypto-buddy-price-notification-news">
+    <link rel="alternate" href="/atom.xml" type="application/atom+xml">
+    <title>Crypto Buddy : Price, Notification & News | SHTB Blog</title>
+
+    <link rel="stylesheet" type="text/css" href="../../styles/style.css" />
+
+    <!-- Icons-->
+    <link rel="apple-touch-icon" sizes="180x180" href="../../img/logo_dark.svg" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../img/logo_dark.svg"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../img/logo_dark.svg"
+    />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/js.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  </head>
+
+  <body>
+    
+
+    <main>
+    
+
+ <section>
+  
+    <h1>Crypto Buddy : Price, Notification & News</h1>
+  
+
+  <aside>
+    <p>published on 2022-10-15
+    
+    · tagged with
+      
+          <a href="/tags/backend.html">#backend</a>
+      
+      </p>
+    </aside>
+  </section>
+
+  <h2><strong>Brief Overview of the App</strong></h2>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+
+<span class="w">   </span><span class="s2">&quot;dependencies&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="s2">&quot;@expo/vector-icons&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;^12.0.0&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;@react-native-async-storage/async-storage&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;^1.13.0&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;@react-native-masked-view/masked-view&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;^0.2.4&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;@react-navigation/bottom-tabs&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;^5.x&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;@react-navigation/native&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;^5.9.4&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;@react-navigation/stack&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;^5.14.4&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;axios&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;^0.21.1&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;expo&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;~41.0.1&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;expo-linking&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;~2.2.3&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;expo-notifications&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;~0.11.6&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;expo-status-bar&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;~1.0.4&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;react&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;16.13.1&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;react-dom&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;16.13.1&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;react-native&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/expo/react-native/archive/sdk-41.0.0.tar.gz&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;react-native-debounce-input&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;^1.0.5&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;react-native-gesture-handler&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;~1.10.2&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;react-native-render-html&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;^6.2.0&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;react-native-screens&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;~3.0.0&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;react-native-skeleton-content&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;^1.0.23&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;react-native-swipe-list-view&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;^3.2.7&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;react-redux&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;^7.2.6&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;redux&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;^4.1.2&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="s2">&quot;redux-thunk&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;^2.4.0&quot;</span>
+
+<span class="w">  </span><span class="p">},</span>
+
+<span class="p">}</span>
+</code></pre></div>
+
+<h2><strong><em>*The Development Framework</em></strong>*</h2>
+<p>The main framework of this application is React Native. React Native is cross platform mobile app development backed by Facebook and open source community and it is based on the popular frontend framework React.</p>
+<p>React Native compiles real native UI elements and the logic part of the application is handled by a JavaScript engine, The native thread and JavaScript thread talk to each other via asynchronous bridge.</p>
+<h2><strong><em>*Redux for state management</em></strong>*</h2>
+<p>Redux is the most popular state management library out there and it is highly recommended for complex applications , as of now this application is not that much complex, for some people the use of Redux at this stage might be an overkill but since I am planning on expanding the application further and more features in the future ,I used Redux to manage the state from the beginning so that I have prevented future headache when porting a large and complex app to redux.</p>
+<h2><strong><em>*Cryptocurrency Market Data API</em></strong>*</h2>
+<p>I have usedï¿½CoinGecko API to get the latest market data and analytics of the cryptocurrency market. CoinGecko is free to use and does not require any access token to the data from their API. You can check it Out fromï¿½here.</p>
+<h2><strong><em>*News API</em></strong>*</h2>
+<p>To get the latest news and articles about cryptocurrency, I have used my own custom API which is built with Laravel as the backend. The news and articles are from top and reliable sources and there is a link to the original source with all the news and articles.</p>
+<h2><strong>How to get the Android App</strong></h2>
+<p>As of now Crypto Buddy is only available for Android with a future plan to be released for IOS also.</p>
+<p><a href="https://play.google.com/com.cryptobuddy.shahryartayeb">Get it from here</a></p>
+<h2><strong>App Preview</strong></h2>
+<div class="embed-youtube" >
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/93HHDl0oRAU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+</div>
+
+
+    </main>
+
+    <br/>
+    <br/>
+
+
+    <footer>
+      <a class="kopimi" href="#" title="Kopimi">
+        <img class="kopimi" src="../../img/logo_dark.svg" title="SHTB Logo" />
+      </a>
+    </footer>
+
+    <script
+      type="module"
+      src="../../js/main.fucking.js"
+      type="text/javascript"
+    ></script>
+  </body>
+
+</html>

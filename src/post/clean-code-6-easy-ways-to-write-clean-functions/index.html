@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="author" content="Shahryar Tayeb">
+    <meta name="description" content="clean-code-6-easy-ways-to-write-clean-functions">
+    <link rel="alternate" href="/atom.xml" type="application/atom+xml">
+    <title>Clean Code: 6 Easy Ways to Write Clean Functions | SHTB Blog</title>
+
+    <link rel="stylesheet" type="text/css" href="../../styles/style.css" />
+
+    <!-- Icons-->
+    <link rel="apple-touch-icon" sizes="180x180" href="../../img/logo_dark.svg" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../img/logo_dark.svg"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../img/logo_dark.svg"
+    />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/js.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  </head>
+
+  <body>
+    
+
+    <main>
+    
+
+ <section>
+  
+    <h1>Clean Code: 6 Easy Ways to Write Clean Functions</h1>
+  
+
+  <aside>
+    <p>published on 2022-10-29
+    
+    · tagged with
+      
+          <a href="/tags/backend.html">#backend</a>
+      
+      </p>
+    </aside>
+  </section>
+
+  <h2>Introduction</h2>
+<p>The most important concept to remember when writing code is that <strong>we write code for other developers, not just computers.</strong></p>
+<p>If you haven&rsquo;t looked at your code in a few months and didn&rsquo;t write it cleanly, remembering which function does what and how everything fits together can take a long time.</p>
+<p>Now Consider looking at someone else&rsquo;s messy and unclean code. Isn&rsquo;t it a nightmare?</p>
+<blockquote>
+<p>Refactoring code is changing theï¿½structure of a piece of code without changing itsï¿½behavior.</p>
+</blockquote>
+<h2>What is a clean function ?</h2>
+<p>Itï¿½s function that another developer can read, understand and easily extend.</p>
+<p>A function is clean when it is:</p>
+<ul>
+<li>
+<p>Readable</p>
+</li>
+<li>
+<p>Searchable</p>
+</li>
+<li>
+<p>Understandable</p>
+</li>
+</ul>
+<h2>How to achieve clean function ?</h2>
+<ol>
+<li>
+<p>Write small functions</p>
+</li>
+<li>
+<p>Clean Organization (Spacing and Returns)</p>
+</li>
+<li>
+<p>Eliminate Boolean flags (Should do one thing)</p>
+</li>
+<li>
+<p>Naming and standardization</p>
+</li>
+<li>
+<p>Limiting parameters</p>
+</li>
+<li>
+<p>Encapsulating conditions</p>
+</li>
+</ol>
+<h3>1. Write small function</h3>
+<blockquote>
+<p>ï¿½The first rule of functions is that they should be small. The second rule of functions is that they should be smaller than that.ï¿½</p>
+<p>ï¿½</p>
+<p><em>Robert C. Martin, Clean Code: A Handbook of Agile Software Craftsmanship</em></p>
+</blockquote>
+<p>Small functions are easy to understand and have a clear purpose.Generally a function should be between 20 to 30 lines, any more than that is considered lengthy function and can be refactored in to smaller functions.</p>
+<h3>2. Clean Organization (Spacing and Returns)</h3>
+<p>All the initializations , logic and return part of a function should have space between them, check the code bellow and compare the two.</p>
+<p>The one without spacing is more difficult to understand, while the one with spacing is easier to read.</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// With no spacing</span>
+
+<span class="kd">function</span><span class="w"> </span><span class="nx">addUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">userData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{...</span><span class="nx">user</span><span class="p">,</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Admin&#39;</span><span class="p">};</span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nx">userData</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">   </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">userData</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+
+
+<span class="c1">// With appropriate spacing</span>
+
+<span class="kd">function</span><span class="w"> </span><span class="nx">addUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">userData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{...</span><span class="nx">user</span><span class="p">,</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Admin&#39;</span><span class="p">};</span>
+
+
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nx">userData</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+
+
+<span class="w">    </span><span class="p">}</span>
+
+
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">userData</span><span class="p">;</span>
+
+<span class="p">}</span>
+</code></pre></div>
+
+<h3>3. Eliminate Boolean flags (Functions should do one thing)</h3>
+<p>One function should only do one thing. If a function does more than one thing, it should be divided into separate functions.</p>
+<p>Looking for Boolean flags in our code is an easy way to tell if a function is doing more than one thing.</p>
+<p>Take a look at the bellow function.</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">displayUsers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">isNewUser</span><span class="p">,</span><span class="w"> </span><span class="nx">email</span><span class="p">,</span><span class="w"> </span><span class="nx">usersList</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// Only runs when we deleted a user</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">email</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// remove the user having &#39;email&#39; from the list.</span>
+
+<span class="w">  </span><span class="p">}</span>
+
+
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nx">isNewUser</span><span class="p">){</span>
+
+<span class="w">        </span><span class="c1">// only runs when a new user is added.  </span>
+
+<span class="w">    </span><span class="p">}</span>
+
+
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">defaultThing</span><span class="p">;</span>
+
+
+
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The above function does three different things using the Boolean flags. We can simply refactor the function and put each functionality into a separate function of itself.</p>
+<ul>
+<li>
+<p>removeUserFromList()</p>
+</li>
+<li>
+<p>addUserToList()</p>
+</li>
+</ul>
+<p>Now instead of calling <code>displayUsers()</code> function with different Boolean flags to do the task, we can call its own specific functions. This way our code is more readable and future developers donï¿½t have to open the  <code>displayUser()</code> function to decipher what each flags does.</p>
+<h3>4. Naming and standardization</h3>
+<h4>Descriptive Name</h4>
+<p>The name of a function should explain what it does. Nothing less and nothing more. Functions with names like &ldquo;add,&rdquo; &ldquo;do&rdquo; aren&rsquo;t very useful because we don&rsquo;t know what they&rsquo;re supposed to do and there are several possibilities.</p>
+<p>Look at the code below; the function <code>addUser()</code> can add any type of user and there is no way to tell just by their name.</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// Descriptive Names - BAD</span>
+
+<span class="kd">function</span><span class="w"> </span><span class="nx">addUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">userData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{...</span><span class="nx">user</span><span class="p">,</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Admin&#39;</span><span class="p">};</span>
+
+<span class="w">    </span><span class="c1">// adds user to DB</span>
+
+<span class="p">}</span>
+</code></pre></div>
+
+<p>In the above code we add users of type ï¿½Adminï¿½ so a better name for this function would be like this.</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// Descriptive Names - GOOD</span>
+
+<span class="kd">function</span><span class="w"> </span><span class="nx">addAdminUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">userData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{...</span><span class="nx">user</span><span class="p">,</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Admin&#39;</span><span class="p">};</span>
+
+<span class="w">    </span><span class="c1">// adds user to DB</span>
+
+<span class="p">}</span>
+</code></pre></div>
+
+<h4>Standardize your naming</h4>
+<p>Standardize your naming; for example, functions that return or retrieve something should begin with <code>get</code>, while functions that update a value should begin with <code>set</code>.</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// Standardization of Naming</span>
+
+<span class="kd">function</span><span class="w"> </span><span class="nx">getAdminById</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">//  gets admin</span>
+
+<span class="p">}</span>
+
+
+
+<span class="kd">function</span><span class="w"> </span><span class="nx">getUserById</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// gets user    </span>
+
+<span class="p">}</span>
+</code></pre></div>
+
+<h3>5. Limiting parameters</h3>
+<p>Functions with more than 2 arguments should be avoided whenever possible. When the number of arguments start to growth to more than 2 arguments, we need to start thinking on how to shorten it. </p>
+<p>One way to do it is to wrap them in specific class or Object that describe their meaning better.</p>
+<p>Bellow is the example of bad and good practices.</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">//  Limit Params - BAD</span>
+
+<span class="kd">function</span><span class="w"> </span><span class="nx">getUsersFullName</span><span class="p">(</span><span class="nx">first</span><span class="p">,</span><span class="w"> </span><span class="nx">middle</span><span class="p">,</span><span class="w"> </span><span class="nx">last</span><span class="p">,</span><span class="w"> </span><span class="nx">nickName</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">first</span><span class="si">}</span><span class="sb"> </span><span class="si">${</span><span class="nx">middle</span><span class="si">}</span><span class="sb"> </span><span class="si">${</span><span class="nx">last</span><span class="si">}</span><span class="sb"> - AKA: </span><span class="si">${</span><span class="nx">nickName</span><span class="si">}</span><span class="sb">`</span>
+
+<span class="p">}</span>
+
+
+
+<span class="c1">//  Limit Params - GOOD</span>
+
+<span class="kd">function</span><span class="w"> </span><span class="nx">getUsersFullName2</span><span class="p">(</span><span class="nx">userName</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">userName</span><span class="p">.</span><span class="nx">first</span><span class="si">}</span><span class="sb"> </span><span class="si">${</span><span class="nx">userName</span><span class="p">.</span><span class="nx">middle</span><span class="si">}</span><span class="sb"> </span><span class="si">${</span><span class="nx">userName</span><span class="p">.</span><span class="nx">last</span><span class="si">}</span><span class="sb"> - AKA: </span><span class="si">${</span><span class="nx">userName</span><span class="p">.</span><span class="nx">nickName</span><span class="si">}</span><span class="sb">`</span>
+
+<span class="p">}</span>
+</code></pre></div>
+
+<p>In the above code we see that all the parameters can be wrapper in an Object that can better describe their meaning.</p>
+<h3>6. Encapsulating conditions</h3>
+<p>Whenever the condition logic of the <code>if</code> or <code>else if</code> statement is too long. We should encapsulate the condition and its logic in to separate function.</p>
+<p>Have a look at the bellow code.</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">getNonPrimaryUsers</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">isActive</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">user</span><span class="p">.</span><span class="nx">isPrimaryAccount</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">user</span><span class="p">.</span><span class="nx">subMembers</span><span class="p">;</span>
+
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">&#39;User is not Primary Account Holder.&#39;</span><span class="p">);</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div>
+
+<p>In the condition of the <code>if</code> statement we check for two things, first if the user is active and second if the user is primary account. </p>
+<p>To make this function more readable, we can separate the conditions to their own functions with a descriptive names to precisely describe what is does.</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">getIsUserPrimaryActiveAccount</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">isPrimaryAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">user</span><span class="p">.</span><span class="nx">isPrimaryAccount</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">isActive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">user</span><span class="p">.</span><span class="nx">isActive</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+
+
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">isActive</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">isPrimaryAccount</span><span class="p">;</span>
+
+<span class="p">}</span>
+</code></pre></div>
+
+<p>After applying it our code it will look something like this.</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">getNonPrimaryUsers</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nx">getIsUserPrimaryActiveAccount</span><span class="p">(</span><span class="nx">user</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">user</span><span class="p">.</span><span class="nx">subMembers</span><span class="p">;</span>
+
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">&#39;User is not Primary Account Holder.&#39;</span><span class="p">);</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">}</span>
+
+
+
+<span class="kd">function</span><span class="w"> </span><span class="nx">getIsUserPrimaryActiveAccount</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">isPrimaryAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">user</span><span class="p">.</span><span class="nx">isPrimaryAccount</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">isActive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">user</span><span class="p">.</span><span class="nx">isActive</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+
+
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">isActive</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">isPrimaryAccount</span><span class="p">;</span>
+
+<span class="p">}</span>
+</code></pre></div>
+
+<h2>Summary</h2>
+<p>The important thing that you need to remember is that clean code is <strong>subjective</strong> . Different developers may have different opinions and ideas on what is clean code.</p>
+<p>Go for what works for you and your team.</p>
+<p><strong>Clean functions are:</strong></p>
+<ul>
+<li>
+<p>Readable</p>
+</li>
+<li>
+<p>Searchable</p>
+</li>
+<li>
+<p>Understandable</p>
+</li>
+</ul>
+<p><strong>How to write clean functions?</strong></p>
+<ol>
+<li>
+<p>Write small functions</p>
+</li>
+<li>
+<p>Leave spaces between declarations, logic and return statement</p>
+</li>
+<li>
+<p>Eliminate Boolean flags - your function should do only one thing</p>
+</li>
+<li>
+<p>Give descriptive names to your functions</p>
+</li>
+<li>
+<p>Limit the number of parameters </p>
+</li>
+<li>
+<p>Separate complex conditions into their own functions with descriptive names</p>
+</li>
+</ol>
+<h2>Resources</h2>
+<p><a href="https://scrimba.com/learn/cleancode">Clean code course in Scrimba</a></p>
+
+
+    </main>
+
+    <br/>
+    <br/>
+
+
+    <footer>
+      <a class="kopimi" href="#" title="Kopimi">
+        <img class="kopimi" src="../../img/logo_dark.svg" title="SHTB Logo" />
+      </a>
+    </footer>
+
+    <script
+      type="module"
+      src="../../js/main.fucking.js"
+      type="text/javascript"
+    ></script>
+  </body>
+
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="author" content="Shahryar Tayeb">
+    <meta name="description" content="how-to-setup-vite-js-with-django-4x">
+    <link rel="alternate" href="/atom.xml" type="application/atom+xml">
+    <title>Supercharge Your Django Web Development with Vite.js and Tailwind CSS: Step by Step guide | SHTB Blog</title>
+
+    <link rel="stylesheet" type="text/css" href="../../styles/style.css" />
+
+    <!-- Icons-->
+    <link rel="apple-touch-icon" sizes="180x180" href="../../img/logo_dark.svg" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../img/logo_dark.svg"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../img/logo_dark.svg"
+    />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/js.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  </head>
+
+  <body>
+    
+
+    <main>
+    
+
+ <section>
+  
+    <h1>Supercharge Your Django Web Development with Vite.js and Tailwind CSS: Step by Step guide</h1>
+  
+
+  <aside>
+    <p>published on 2023-07-19
+    
+    · tagged with
+      
+          <a href="/tags/backend.html">#backend</a>
+      
+      </p>
+    </aside>
+  </section>
+
+  <h2>Related Articles</h2>
+<ol>
+<li><a href="https://blog.shahryartayeb.com/post/automatically-generate-erd-of-your-django-models">Automatically Generate ERD of Your Django Models</a></li>
+<li><a href="https://blog.shahryartayeb.com/post/how-to-split-your-django-project-settings">How to Split Your Django Project Settings
+</a></li>
+</ol>
+<h2>Introduction</h2>
+<h1></h1>
+<p>Vite is a build tool that aims to provide a faster and leaner development experience for modern web projects.
+It comes with two major feature:
+- A dev server with rich features and extremely robust HMR(Hot module replacement)
+- A build command that bundels your code in an optimized assets ready for production</p>
+<p>In this article we will setup Vite to bundle and serve our django static files. The process is simple and straightforward to let&rsquo;s begin.</p>
+<h2>Project structure</h2>
+<p>You can follow these steps in an old or new django project without any major changes. 
+For the purpose of this article we will be using a project with bellow structure.</p>
+<div class="mockup-code">
+
+
+<div class="codehilite"><pre><span></span><code>MYSITE
+<span class="w"> </span>&gt;<span class="w"> </span>.venv
+<span class="w"> </span>&gt;<span class="w"> </span>blog
+<span class="w"> </span>&gt;<span class="w"> </span>mysite
+<span class="w"> </span>&gt;<span class="w"> </span>static
+<span class="w"> </span>&gt;<span class="w"> </span>templates
+<span class="w">   </span>manage.py
+<span class="w">   </span>requirements.txt
+</code></pre></div>
+
+
+
+</div>
+
+<h3>Django static files settings</h3>
+<p>mysite/settings.py</p>
+<div class="codehilite"><pre><span></span><code><span class="n">STATIC_URL</span> <span class="o">=</span> <span class="s2">&quot;static/&quot;</span>
+<span class="n">STATICFILES_DIRS</span> <span class="o">=</span> <span class="p">[</span><span class="n">BASE_DIR</span> <span class="o">/</span> <span class="s2">&quot;static&quot;</span><span class="p">]</span>
+<span class="n">STATIC_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s2">&quot;staticfiles&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h2>Setup npm</h2>
+<p>In this artilce, I will setup npm in the root of the project. In the terminal run the bellow command.</p>
+<div class="mockup-code">
+
+
+<div class="codehilite"><pre><span></span><code>npm<span class="w"> </span>init
+</code></pre></div>
+
+
+
+</div>
+
+<p>This will create a package.json file in the root of your application with the bellow content by default.</p>
+<h1></h1>
+<p><strong>package.json</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;mysite&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;main&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;index.js&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;scripts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;test&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;echo \&quot;Error: no test specified\&quot; &amp;&amp; exit 1&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;license&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ISC&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This has setup npm in our project so now lets install Vite and Tailwind Css to our project.</p>
+<h2>Install Vite and Tailwindcss</h2>
+<div class="mockup-code">
+
+
+<div class="codehilite"><pre><span></span><code>npm<span class="w"> </span>install<span class="w"> </span>-D<span class="w"> </span>vite<span class="w"> </span>tailwindcss<span class="w"> </span>postcss<span class="w"> </span>autoprefixer<span class="w"> </span>django-vite-plugin
+</code></pre></div>
+
+
+
+</div>
+
+<p>Initialize tailwind css with the bellow command. It will create <code>tailwind.config.js</code> and <code>postcss.config.js</code> files in the root of your application.</p>
+<h1></h1>
+<div class="mockup-code">
+
+
+<div class="codehilite"><pre><span></span><code>npx<span class="w"> </span>tailwindcss<span class="w"> </span>init<span class="w"> </span>-p
+</code></pre></div>
+
+
+
+</div>
+
+<h1></h1>
+<p>Edit the <code>tailwind.config.js</code> to tell tailwind which files it should watch for changes.</p>
+<h1></h1>
+<div class="codehilite"><pre><span></span><code><span class="cm">/** @type {import(&#39;tailwindcss&#39;).Config} */</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">content</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;./templates/**/*.{html,js}&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;./**/templates/**/*.{html,js}&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nx">theme</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">extend</span><span class="o">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">plugins</span><span class="o">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h1></h1>
+<p><code>"./templates/**/*.{html,js}"</code></p>
+<h1></h1>
+<p>Watch all html and js file inside the templates folder in the root of our project.</p>
+<div class="codehilite"><pre><span></span><code>MYSITE
+<span class="w"> </span>&gt;<span class="w"> </span>...
+<span class="w"> </span>&gt;<span class="w"> </span>templates
+<span class="w">   </span>manage.py
+<span class="w">   </span>requirements.txt
+</code></pre></div>
+
+<h1></h1>
+<p><code>"./**/templates/**/*.{html,js}"</code></p>
+<p>Watch all html and js files inside each app templates folder.</p>
+<div class="mockup-code">
+
+
+<div class="codehilite"><pre><span></span><code>MYSITE
+&gt;<span class="w"> </span>...
+<span class="w"> </span>&gt;<span class="w"> </span>blog
+<span class="w">   </span>-<span class="w"> </span>templates
+<span class="w">      </span>-<span class="w"> </span>blog
+<span class="w"> </span>&gt;<span class="w"> </span>...
+<span class="w">   </span>manage.py
+<span class="w">   </span>requirements.txt
+</code></pre></div>
+
+
+
+</div>
+
+<p>Tailwind will watch those files for changes and add/reload necessary css classes.</p>
+<h1></h1>
+<h2>Setup Vite</h2>
+<h3>Create main.js and tailwind.css files</h3>
+<p>In the static folder at the root of your project create the bellow files</p>
+<h1></h1>
+<p><strong>static/js/main.js</strong></p>
+<h1></h1>
+<div class="codehilite"><pre><span></span><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Js is working&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<h1></h1>
+<p><strong>static/css/tailwind.css</strong></p>
+<h1></h1>
+<div class="codehilite"><pre><span></span><code><span class="p">@</span><span class="k">tailwind</span><span class="w"> </span><span class="nt">base</span><span class="p">;</span>
+<span class="p">@</span><span class="k">tailwind</span><span class="w"> </span><span class="nt">components</span><span class="p">;</span>
+<span class="p">@</span><span class="k">tailwind</span><span class="w"> </span><span class="nt">utilities</span><span class="p">;</span>
+</code></pre></div>
+
+<h1></h1>
+<p>Create <code>**vite.config.js**</code> file with the create js and css files as input.</p>
+<h1></h1>
+<div class="codehilite"><pre><span></span><code><span class="c1">//vite.config.js</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">defineConfig</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;vite&quot;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="nx">djangoVite</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;django-vite-plugin&quot;</span><span class="p">;</span>
+
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="nx">defineConfig</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">plugins</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nx">djangoVite</span><span class="p">({</span>
+<span class="w">      </span><span class="nx">input</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;./static/js/main.js&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;./static/styles/tailwind.css&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="p">}),</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<p>add vite scripts to <code>package.json</code></p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// ...</span>
+
+<span class="nt">&quot;scripts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;test&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;echo \&quot;Error: no test specified\&quot; &amp;&amp; exit 1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dev&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;vite&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;build&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;vite build&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;preview&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;vite preview&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+
+<span class="c1">// ...</span>
+</code></pre></div>
+
+<h2>Install <a href="https://github.com/protibimbok/django-vite-plugin">django_vite_plugin</a></h2>
+<p>We will be using this plugin to configure Vite with our django backend project.</p>
+<div class="mockup-code">
+
+
+<div class="codehilite"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>django_vite_plugin
+</code></pre></div>
+
+
+
+</div>
+
+<p>add the plugin to installed_apps</p>
+<p>mysite/settings.py</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># mysite/settings.py</span>
+
+<span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># ...,</span>
+
+<span class="s1">&#39;django_vite_plugin&#39;</span><span class="p">,</span>
+
+<span class="p">]</span>
+</code></pre></div>
+
+<p>add the plugin settings and setup templates in django</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># mysite/settings.py</span>
+
+<span class="n">DJANGO_VITE_PLUGIN</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;BUILD_DIR&quot;</span><span class="p">:</span> <span class="s2">&quot;staticfiles/build&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BUILD_URL_PREFIX&quot;</span><span class="p">:</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">STATIC_URL</span> <span class="o">+</span> <span class="s2">&quot;build&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DEV_MODE&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h1></h1>
+<p><code>"BUILD_URL_PREFIX": "/" + STATIC_URL + "build"</code></p>
+<p>The prefix the will be added to our built assets URLs</p>
+<h1></h1>
+<p><code>"DEV_MODE": True</code></p>
+<p>If true, the routes for the assets will use <code>http:127.0.0.1:5173</code> and If false the plugin will use the compiled version of our assets.</p>
+<ul>
+<li>True</li>
+<li>
+<p><code>http://127.0.0.1:5173/static/js/main.js](http://127.0.0.1:5173/static/js/main.js)</code></p>
+</li>
+<li>
+<p>False</p>
+<ul>
+<li><code>http://127.0.0.1:8000/static/build/assets/main-9c837c14.js](http://127.0.0.1:5173/static/js/main.js)</code></li>
+</ul>
+</li>
+</ul>
+<h2>Load Vite in templates</h2>
+<h1></h1>
+<p>create a template file</p>
+<h1></h1>
+<p><strong>templates/blog//main.html</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+
+{% load vite %}
+
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;X-UA-Compatible&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;IE=edge&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;viewport&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;width=device-width, initial-scale=1.0&quot;</span> <span class="p">/&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>My Django Site<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+
+    {% vite &#39;css/tailwind.css&#39; %}
+
+  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+
+  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h2</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;text-red-500 font-bold&quot;</span><span class="p">&gt;</span>This is a template<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+
+    {% vite &#39;js/main.js&#39; %}
+  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<blockquote>
+<p>I have assumed that you know how to setup urls and views in django
+</p>
+</blockquote>
+<p>output</p>
+<p><img alt="desc" src="https://blog.shahryartayeb.com/uploads/55/conversions/untitled-webp.webp"></p>
+<h1></h1>
+<p>Tailwind is successfully setup so lets create a full page</p>
+<h1></h1>
+<h3>Full tailwind page</h3>
+<p>Letï¿½s get a full tailwind page from tailwind components for out home page
+<a href="https://tailwindui.com/components/application-ui/application-shells/stacked">https://tailwindui.com/components/application-ui/application-shells/stacked</a></p>
+<h1></h1>
+<p><code>templates/blog/main.html</code></p>
+<h1></h1>
+<p>The output will be</p>
+<h1></h1>
+<p><img alt="desc" src="https://blog.shahryartayeb.com/uploads/56/conversions/untitled-1-webp.webp"></p>
+<h2>Setup for production environment</h2>
+<p>Build the assets for production. The compiled assets will be on the folder the we specified in the plugin settings.</p>
+<div class="codehilite"><pre><span></span><code><span class="n">DJANGO_VITE_PLUGIN</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># ....</span>
+    <span class="s2">&quot;DEV_MODE&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="c1"># ....</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>"BUILD_DIR": "staticfiles/build"</code></p>
+<p>to build the assets run the bellow command in your production environment.</p>
+<div class="mockup-code">
+
+
+<div class="codehilite"><pre><span></span><code>npm<span class="w"> </span>run<span class="w"> </span>build
+</code></pre></div>
+
+
+
+</div>
+
+<p>If you are using a managed hosting provider you need to change or customize the default build process for your project.</p>
+<h1></h1>
+<p>As an example railway uses nixpacks for building your project and detects the framework automatically for you.</p>
+<h1></h1>
+<p>The problem with our current setup is that we have both<code>package.json</code> and <code>requirement.txt</code> file by default nix will pickup node js and will try to build it using node settings which will fail.</p>
+<h1></h1>
+<p>So to customize this create <code>nixpacks.toml</code> </p>
+<div class="codehilite"><pre><span></span><code><span class="n">providers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">,</span><span class="s2">&quot;...&quot;</span><span class="p">]</span>
+
+<span class="k">[phases.build]</span>
+<span class="n">cmds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;echo SHTB_first&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;echo SHTB_last&quot;</span><span class="p">]</span>
+</code></pre></div>
+
+<h1></h1>
+<p>In the above TOML file, we told nixpack to first use python settings then your auto detected languages/frameworks.</p>
+<h1></h1>
+<p>Or if your <code>package.json</code> if inside another folder such as <code>static</code> use the cmds to build the assets after the python settings are done.</p>
+<h2>Conclusion</h2>
+<p>We successfully setup Vite and insalled tailwindcss on a django project</p>
+<h1></h1>
+
+
+    </main>
+
+    <br/>
+    <br/>
+
+
+    <footer>
+      <a class="kopimi" href="#" title="Kopimi">
+        <img class="kopimi" src="../../img/logo_dark.svg" title="SHTB Logo" />
+      </a>
+    </footer>
+
+    <script
+      type="module"
+      src="../../js/main.fucking.js"
+      type="text/javascript"
+    ></script>
+  </body>
+
+</html>

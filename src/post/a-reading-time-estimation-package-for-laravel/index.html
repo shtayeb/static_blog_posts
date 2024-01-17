@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="author" content="Shahryar Tayeb">
+    <meta name="description" content="a-reading-time-estimation-package-for-laravel">
+    <link rel="alternate" href="/atom.xml" type="application/atom+xml">
+    <title>A "Reading TIme" Estimation Package For Laravel | SHTB Blog</title>
+
+    <link rel="stylesheet" type="text/css" href="../../styles/style.css" />
+
+    <!-- Icons-->
+    <link rel="apple-touch-icon" sizes="180x180" href="../../img/logo_dark.svg" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../img/logo_dark.svg"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../img/logo_dark.svg"
+    />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/js.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  </head>
+
+  <body>
+    
+
+    <main>
+    
+
+ <section>
+  
+    <h1>A "Reading TIme" Estimation Package For Laravel</h1>
+  
+
+  <aside>
+    <p>published on 2023-09-13
+    
+    · tagged with
+      
+          <a href="/tags/backend.html">#backend</a>
+      
+      </p>
+    </aside>
+  </section>
+
+  <h1>Bookworm for Laravel: A Time Estimation Package</h1>
+<p>Bookworm for Laravel is a time estimation package that can be used to estimate how much time is needed to read a certain piece of text. It can be installed in Laravel projects and used to calculate the estimated reading time of articles, blog posts, or any other text content.</p>
+<h2>Benefits</h2>
+<p>Bookworm for Laravel is a useful package for any Laravel developer who needs to estimate the reading time of text content. This package can be used in a variety of scenarios, such as:</p>
+<ul>
+<li>Estimating the reading time of blog posts or articles</li>
+<li>Take the reading time of code blocks and Images into consideration</li>
+<li>Helping users decide whether to read a piece of content based on its estimated reading time</li>
+</ul>
+<p>By using Bookworm for Laravel, you can provide a better user experience for your readers by giving them an idea of how long it will take to read your content. This can help them plan their time more effectively and make informed decisions about what content to read.</p>
+<h2>Installation</h2>
+<p>To install Bookworm for Laravel, run the following command in your Laravel project:</p>
+<div class="codehilite"><pre><span></span><code>composer<span class="w"> </span>require<span class="w"> </span>shtayeb/bookworm
+</code></pre></div>
+
+<p>After installing the package, you need to publish the config file by running the following command:</p>
+<div class="codehilite"><pre><span></span><code>php<span class="w"> </span>artisan<span class="w"> </span>vendor:publish<span class="w"> </span>--provider<span class="o">=</span><span class="s2">&quot;SHTayeb\\Bookworm\\BookwormServiceProvider&quot;</span>
+</code></pre></div>
+
+<p>This will create a <code>bookworm.php</code> file in your <code>config</code> directory.</p>
+<h2>Usage</h2>
+<p>To use Bookworm for Laravel, you need to create an instance of the <code>Bookworm</code> class and call the <code>estimate</code> method with the text you want to estimate the reading time for.</p>
+<div class="codehilite"><pre><span></span><code><span class="cp">&lt;?php</span>
+<span class="k">use</span> <span class="nx">SHTayeb\\Bookworm\\Bookworm</span><span class="p">;</span>
+
+<span class="nv">$text</span> <span class="o">=</span> <span class="s1">&#39;...&#39;</span><span class="p">;</span>
+
+<span class="nv">$time</span> <span class="o">=</span> <span class="p">(</span><span class="k">new</span> <span class="nx">Bookworm</span><span class="p">())</span><span class="o">-&gt;</span><span class="na">estimate</span><span class="p">(</span><span class="nv">$text</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$time</span><span class="p">;</span> <span class="c1">// 5 minutes</span>
+</code></pre></div>
+
+<p>You can also count the number of words in a text using the <code>countWords</code> method:</p>
+<div class="codehilite"><pre><span></span><code><span class="x">$word_count = (new Bookworm())-&gt;countWords($text);</span>
+
+<span class="x">echo $word_count; // 1,000</span>
+</code></pre></div>
+
+<h2>Configuration</h2>
+<p>The package comes with default configuration values that can be overridden by publishing the config file. You can change these values in the <code>config/bookworm.php</code> file.</p>
+<div class="codehilite"><pre><span></span><code><span class="x">return [</span>
+<span class="x">    &#39;words_per_minute&#39; =&gt; 200,</span>
+<span class="x">    &#39;codewords_per_minute&#39; =&gt; 200,</span>
+<span class="x">    &#39;seconds_per_image&#39; =&gt; 12,</span>
+<span class="x">];</span>
+</code></pre></div>
+
+<ul>
+<li>The <code>words_per_minute</code> value is the average number of words a person can read in one minute.</li>
+<li>The <code>codewords_per_minute</code> value is the average number of words in a code section a person can read in one minute.</li>
+<li>The <code>seconds_per_image</code> value is the average number of seconds a person looks at an image.</li>
+</ul>
+<h2>Real-life Example</h2>
+<p>Suppose you run a blog and want to display the estimated reading time of your blog posts. You can use this package to calculate the estimated reading time and display it on your blog post page.</p>
+<h3>In a Controller</h3>
+<div class="codehilite"><pre><span></span><code><span class="cp">&lt;?php</span>
+<span class="k">use</span> <span class="nx">SHTayeb\\Bookworm\\Bookworm</span><span class="p">;</span>
+
+<span class="c1">// get blog post content from database</span>
+<span class="nv">$post</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">find</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+
+<span class="c1">// calculate estimated reading time</span>
+<span class="nv">$reading_time</span> <span class="o">=</span> <span class="p">(</span><span class="k">new</span> <span class="nx">Bookworm</span><span class="p">())</span><span class="o">-&gt;</span><span class="na">estimate</span><span class="p">(</span><span class="nv">$post</span><span class="o">-&gt;</span><span class="na">content</span><span class="p">);</span>
+</code></pre></div>
+
+<p>And display the result in your blade views</p>
+<div class="codehilite"><pre><span></span><code><span class="x">// display estimated reading time on blog post page</span>
+<span class="x">&lt;div class=&quot;reading-time&quot;&gt;{{ $reading_time }} min read&lt;/div&gt;</span>
+</code></pre></div>
+
+<h3>Using Accessors</h3>
+<p>Accessors are methods that allow you to access and modify the values of an objectï¿½s properties.
+In this case, create an accessor for content property of your post and return the read time and word count for that post.</p>
+<div class="codehilite"><pre><span></span><code><span class="x">public function getReadTimeAttribute():array</span>
+<span class="x">{</span>
+<span class="x">    return [</span>
+<span class="x">         &#39;word_count&#39; =&gt; (new Bookworm())-&gt;countWords($this-&gt;content),</span>
+<span class="x">         &#39;read_time&#39; =&gt; (new Bookworm())-&gt;estimate($this-&gt;content),</span>
+<span class="x">    ];</span>
+
+<span class="x">}</span>
+</code></pre></div>
+
+<p>::: warning Warning
+  Be carefull of performance while using it with Accessors, since it will be calculated for each post and If you get a list of 100 post, It has to be calculted to all of them.
+:::</p>
+<h2>Conclusion</h2>
+<p>Bookworm for Laravel is a useful package for any Laravel developer who needs to estimate the reading time of text content. By using this package, you can provide a better user experience for your readers and help them make informed decisions about what content to read.</p>
+
+
+    </main>
+
+    <br/>
+    <br/>
+
+
+    <footer>
+      <a class="kopimi" href="#" title="Kopimi">
+        <img class="kopimi" src="../../img/logo_dark.svg" title="SHTB Logo" />
+      </a>
+    </footer>
+
+    <script
+      type="module"
+      src="../../js/main.fucking.js"
+      type="text/javascript"
+    ></script>
+  </body>
+
+</html>

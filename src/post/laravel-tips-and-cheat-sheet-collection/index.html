@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="author" content="Shahryar Tayeb">
+    <meta name="description" content="laravel-tips-and-cheat-sheet-collection">
+    <link rel="alternate" href="/atom.xml" type="application/atom+xml">
+    <title>Laravel Tips and Cheat Sheet Collection | SHTB Blog</title>
+
+    <link rel="stylesheet" type="text/css" href="../../styles/style.css" />
+
+    <!-- Icons-->
+    <link rel="apple-touch-icon" sizes="180x180" href="../../img/logo_dark.svg" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../img/logo_dark.svg"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../img/logo_dark.svg"
+    />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/js.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  </head>
+
+  <body>
+    
+
+    <main>
+    
+
+ <section>
+  
+    <h1>Laravel Tips and Cheat Sheet Collection</h1>
+  
+
+  <aside>
+    <p>published on 2023-06-24
+    
+    · tagged with
+      
+          <a href="/tags/backend.html">#backend</a>
+      
+      </p>
+    </aside>
+  </section>
+
+  <h3>Laravel CRUD Routes</h3>
+<p>| Verb      | URI                  | Action  | Route Name     | <br>
+| --------- | -------------------- | ------- | -------------- |
+| GET       | /photos              | index   | photos.index   |<br>
+| GET       | /photos/create       | create  | photos.create  |   <br>
+| POST      | /photos              | store   | photos.store   | <br>
+| GET       | /photos/{photo}      | show    | photos.show    |<br>
+| GET       | /photos/{photo}/edit | edit    | photos.edit    | <br>
+| PUT/PATCH | /photos/{photo}      | update  | photos.update  |  <br>
+| DELETE    | /photos/{photo}      | destroy | photos.destroy | </p>
+<h1></h1>
+<h3>PHP native <a href="https://phpstan.org/writing-php-code/phpdoc-types">data types</a></h3>
+<h1></h1>
+<p><strong>Basic types</strong></p>
+<ul>
+<li>int, integer , string, array-key, bool, boolean, true, false, null, float, double, scalar, array, iterable, callable, resource, void, object</li>
+</ul>
+<h3>Array to query string</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">use Illuminate\Support\Arr;</span>
+
+<span class="x">$filters = [</span>
+<span class="x">    &#39;location&#39; =&gt; &#39;USA&#39;,</span>
+<span class="x">    &#39;date_range&#39;=&gt;[</span>
+<span class="x">        &#39;start&#39; =&gt; &#39;2023-01-01&#39;,</span>
+<span class="x">        &#39;end&#39; =&gt; &#39;2020-12-31&#39;</span>
+<span class="x">    ],</span>
+<span class="x">    &#39;author&#39;=&gt;&#39;John Doe&#39;</span>
+<span class="x">];</span>
+
+<span class="x">$queryString = Arr::query($filters);</span>
+<span class="x">$url = &#39;https://example.com/?&#39;.$queryString;</span>
+
+<span class="x">echo $url;</span>
+
+<span class="x">/** Output</span>
+
+<span class="x">    https://example.com/?location=USA&amp;date_range[start]=2023-01-01&amp;date_range[end]=2020-12-31&amp;author=John Doe</span>
+
+<span class="x"> */</span>
+</code></pre></div>
+
+<h3>Relationships cheat table</h3>
+<p>| Laravel Relationship Type   | From parent to child model                         | From child to parent model                        | Pivot Eloquent Model operations |
+| --------------------------- | -------------------------------------------------- | ------------------------------------------------- | ------------------------------- |
+| HasOne/BelongsTo            | <code>$parent-&gt;child()-&gt;save($child)</code>                   | <code>$child-&gt;parent()-&gt;associate($parent)</code>            | N/A                             |
+| HasMany/BelongsTo           | <code>$parent-&gt;children()-&gt;save($child)</code>                | <code>$child-&gt;parent()-&gt;associate($parent)</code>            | N/A                             |
+| BelongsToMany/BelongsToMany | <code>$parent-&gt;children()-&gt;attach($childId,$pivotData)</code> | <code>$child-&gt;parents()-&gt;attach($parentId,$pivotData)</code> | <code>Pivot::create([...])</code>          |
+| MorphToMany/MorphToMany     | <code>$parent-&gt;children()-&gt;attach($childId,$pivotData)</code> | <code>$child-&gt;parents()-&gt;attach($parentId,$pivotData)</code> | <code>Pivot::create([...])</code>          |
+| Polymorphic (one-to-one)    | <code>$parent-&gt;image()-&gt;save($image)</code>                   | <code>$image-&gt;imageable()-&gt;associate($parent)</code>         | N/A                             |
+| Polymorphic (many-to-one)   | <code>$parent-&gt;comments()-&gt;save($comment)</code>              | <code>$comment-&gt;commentable()-&gt;associate($parent)</code>     | N/A                             |
+| Polymorphic (many-to-many)  | <code>$parent-&gt;tags()-&gt;attach($tagId,$pivotData)</code>       | <code>$tag-&gt;taggable()-&gt;attach($parentId,$pivotdata)</code>  | <code>Pivot:::create([...])</code>         |</p>
+<h3>Default values in migrations</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">$table-&gt;string(&#39;name&#39;)-&gt;default(&#39;Untitled&#39;);</span>
+
+<span class="x">$table-&gt;string(&#39;total&#39;)-&gt;default(new Expression(&#39;(quantity * price)&#39;));</span>
+
+<span class="x">$table-&gt;timestamp(&#39;order_date&#39;)-&gt;default(new Expression(&#39;NOW()&#39;));</span>
+
+<span class="x">$table-&gt;integer(&#39;discount&#39;)-&gt;default(new Expression(&#39;(CASE WHEN quantity &gt;= 10 THEN 10 ELSE 0 END)&#39;));</span>
+</code></pre></div>
+
+<h3>Tailwind merge to PHP</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">// circle.blade.php</span>
+<span class="x">&lt;div {{ $attributes-&gt;mergeClasses(&#39;w-10 h-10 rounded-full bg-red-500&#39;) }}&gt;</span>
+<span class="x">&lt;/div&gt;</span>
+
+<span class="x">// view.blade.php</span>
+<span class="x">&lt;x-circle class=&#39;bg-blue-500&#39; /&gt;</span>
+
+<span class="x">// output</span>
+<span class="x">&lt;div class=&quot;w-10 h-10 rounded-full bg-blue-500&quot;&gt;&lt;/div&gt;</span>
+</code></pre></div>
+
+<h3>All <code>Model.php</code> attributes</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">protected $table = &#39;users&#39;; // the table associated with the model</span>
+
+<span class="x">protected $primaryKey = &#39;uuid&#39;; // The primary key for model</span>
+
+<span class="x">protected $keyType = &#39;int&#39;; // The type of the primary key ID</span>
+
+<span class="x">protected $incrementing = true; // Indicates if the IDs should be auto-incrementing</span>
+
+<span class="x">protected $with = []; // The relationship to eager load on every query.</span>
+
+<span class="x">protected $withCount = []; // The relationship counts that should be eager on every query</span>
+
+<span class="x">protected $guarded = [&#39;id&#39;]; // the attributes that are not mass assignable</span>
+
+<span class="x">protected $hidden = []; // attributes that should be hidden from array</span>
+
+<span class="x">protected $fillable = [&#39;email&#39;,&#39;password&#39;]; // attributes that are mass assignable</span>
+
+<span class="x">protected $appends = [&#39;field&#39;]; // The attrubutes that should be include in model</span>
+
+<span class="x">protected $fakeColumns = [&#39;extras&#39;]; // The attrubutes that should be treated as fake columns</span>
+
+<span class="x">public $timestamps = false; // if the model should be timestamped</span>
+
+<span class="x">const CREATED_AT = &#39;createdAt&#39;; // The name of the created_at col</span>
+
+<span class="x">const UPDATED_AT = &#39;updatedAt&#39;; // The name of the updated_at col</span>
+
+<span class="x">protected $perpage = 25; // The number of models to return for pagination</span>
+
+<span class="x">protected $casts = [</span>
+<span class="x">    &#39;assets&#39; =&gt; &#39;array&#39; // The attributes that should be cast to native types.</span>
+<span class="x">];</span>
+</code></pre></div>
+
+<h3>Custom Blade Conditionals</h3>
+<p>AppServiceProvider.php</p>
+<div class="codehilite"><pre><span></span><code><span class="x">// AppServiceProvider::boot()</span>
+<span class="x">Blade::if(&#39;writer&#39;,function(){</span>
+<span class="x">    return in_array(Auth::user()-&gt;role,[&#39;editor&#39;,&#39;reporter&#39;]);</span>
+<span class="x">});</span>
+</code></pre></div>
+
+<p>view.blade.php</p>
+<div class="codehilite"><pre><span></span><code><span class="x">@writer</span>
+<span class="x">    //</span>
+<span class="x">@endwriter</span>
+</code></pre></div>
+
+<h3>Default to a relationship</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">class Comment extends Model</span>
+<span class="x">{</span>
+<span class="x">    public function author(){</span>
+<span class="x">        return $this-&gt;belongsTo(User::class)-&gt;withDefaults([</span>
+<span class="x">            &#39;name&#39; =&gt; &#39;Guest&#39;</span>
+<span class="x">        ]);</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+
+<span class="x">// Now in you view, instead of doing this</span>
+<span class="x">{{ $comment-&gt;author ? $comment-&gt;author-&gt;name : &#39;Guest&#39; }}</span>
+
+<span class="x">// You can do this</span>
+<span class="x">{{ $comment-&gt;author-&gt;name  }}</span>
+</code></pre></div>
+
+<h3>Delted/Prune model data on schedule</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">class Order extends Model</span>
+<span class="x">{</span>
+<span class="x">    use Prunable;</span>
+
+<span class="x">    public function prunable(){</span>
+<span class="x">        return Order::query()</span>
+<span class="x">            -&gt;whereStatus(&#39;abandoned&#39;)</span>
+<span class="x">            -&gt;where(&#39;created_at&#39;,&#39;&lt;=&#39;,now()-&gt;subMonth());</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+
+
+<span class="x">// Console/Kernel.php</span>
+<span class="x">$schedule-&gt;command(&#39;model:prune&#39;)-&gt;daily();</span>
+</code></pre></div>
+
+<h3>whereNotNull()</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">$customers = Customer::query()</span>
+<span class="x">                -&gt;whereNotNull([&#39;payment_date&#39;,&#39;discount_cost&#39;])</span>
+<span class="x">                -&gt;get()</span>
+</code></pre></div>
+
+<h3>Do task after a model was created by factory</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">class UserFactory extends Factory</span>
+<span class="x">{</span>
+<span class="x">    public function definition(){</span>
+<span class="x">        // ...</span>
+<span class="x">    }</span>
+
+<span class="x">    public function configure():static</span>
+<span class="x">    {</span>
+<span class="x">        return $this-&gt;afterCreating(function (User $user){</span>
+<span class="x">            // Task after creating a user</span>
+<span class="x">            return $user-&gt;createTeam();</span>
+<span class="x">        });</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</code></pre></div>
+
+<h3>Saving a model and its relationship with <code>push()</code></h3>
+<div class="codehilite"><pre><span></span><code><span class="x">class User extends Model</span>
+<span class="x">{</span>
+<span class="x">    public function contact(){</span>
+<span class="x">        return $this-&gt;hasOne(Contact::class);</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+
+<span class="x">$user = User::first();</span>
+<span class="x">$user-&gt;name = &#39;John Doe&#39;;</span>
+<span class="x">$user-&gt;contact-&gt;number = &#39;112233445566&#39;;</span>
+
+<span class="x">$user-&gt;push(); // This will update both user and contact record in DB</span>
+</code></pre></div>
+
+<h3>Create route resource</h3>
+<p>Only include specified routes.</p>
+<div class="codehilite"><pre><span></span><code><span class="x">Route::resource(&#39;roles&#39;,RoleController::class)-&gt;only(&#39;update&#39;,&#39;index&#39;);</span>
+</code></pre></div>
+
+<h3>Start and End Data validation rule</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">$rules = [</span>
+<span class="x">    &#39;start_date&#39; =&gt; &#39;after:tomorrow&#39;,</span>
+<span class="x">    &#39;end_date&#39; =&gt; &#39;after:start_date&#39;</span>
+<span class="x">];</span>
+</code></pre></div>
+
+<h3>Run a logic if a query takes a long time</h3>
+<p>AppServiceProvider.php</p>
+<div class="codehilite"><pre><span></span><code><span class="x">public function boot(){</span>
+<span class="x">    // Provide a handler to be invoked when a query executes longer than 300ms</span>
+
+<span class="x">    DB::whenQueryingForLongerThan(300,function ($connection, QueryExecuited $event){</span>
+<span class="x">        dump($event-&gt;sql);</span>
+<span class="x">        dump($event-&gt;binding);</span>
+<span class="x">        dump($event-&gt;time);</span>
+<span class="x">    });</span>
+
+<span class="x">    DB::allowQueryDurationHandlersToRunAgain();</span>
+<span class="x">}</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="x">// The handler will be invoked since the query takes longer</span>
+<span class="x">User::somethingThatTakeLongTime()-&gt;get();</span>
+</code></pre></div>
+
+<h3>Import classes in the same namespace</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">// Instead of this</span>
+<span class="x">use Illuminate\Support\Facaded\DB;</span>
+<span class="x">use Illuminate\Support\Facaded\Log;</span>
+
+<span class="x">// Do this</span>
+<span class="x">use Illuminate\Support\Facaded\{DB,Log};</span>
+</code></pre></div>
+
+<h3>Two ways of updating a model</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">Product::where(&#39;id&#39;,1)-&gt;update([&#39;stock_left&#39;=&gt;1]);</span>
+<span class="x">// Result SQL query</span>
+<span class="x">// Update `products` set `stock_left` = 1 where `id` = 1</span>
+
+<span class="x">Product::find(1)-&gt;update([&#39;stock_left&#39;=&gt;1]);</span>
+<span class="x">// Shorter code but 2 sql queries:</span>
+<span class="x">// - Select * from products where products.id = 1 limit 1</span>
+<span class="x">// - update products set stock_left = 1 where id = 1</span>
+</code></pre></div>
+
+<h3>Pint formatting Github action</h3>
+<div class="codehilite"><pre><span></span><code><span class="nl">name</span><span class="p">:</span><span class="w"> </span><span class="n">PHP</span><span class="w"> </span><span class="n">Linting</span>
+
+<span class="nl">on</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">&#39;</span><span class="n">push</span><span class="err">&#39;</span><span class="p">,</span><span class="w"> </span><span class="err">&#39;</span><span class="n">pull_request</span><span class="err">&#39;</span><span class="p">]</span>
+
+<span class="nl">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nl">phplint</span><span class="p">:</span>
+<span class="w">    </span><span class="n">runs</span><span class="o">-</span><span class="n">on</span><span class="o">:</span><span class="w"> </span><span class="n">ubuntu</span><span class="o">-</span><span class="n">latest</span>
+
+<span class="w">    </span><span class="nl">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">checkout</span>
+<span class="w">        </span><span class="nl">uses</span><span class="p">:</span><span class="w"> </span><span class="n">actions</span><span class="o">/</span><span class="n">checkout</span><span class="p">@</span><span class="n">v3</span>
+
+<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="err">&#39;</span><span class="n">laravel</span><span class="o">-</span><span class="n">pint</span><span class="err">&#39;</span>
+<span class="w">        </span><span class="nl">uses</span><span class="p">:</span><span class="w"> </span><span class="n">aglipanci</span><span class="o">/</span><span class="n">laravel</span><span class="o">-</span><span class="n">pint</span><span class="o">-</span><span class="n">action</span><span class="mf">@2.2.2</span>
+<span class="w">        </span><span class="nl">with</span><span class="p">:</span>
+<span class="w">          </span><span class="nl">preset</span><span class="p">:</span><span class="w"> </span><span class="n">laravel</span>
+<span class="w">          </span><span class="nl">verboseMode</span><span class="p">:</span><span class="w"> </span><span class="nb">true</span>
+<span class="w">          </span><span class="nl">testMode</span><span class="p">:</span><span class="w"> </span><span class="nb">true</span>
+</code></pre></div>
+
+<h3>Read duration Str macro</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">use Illuminate\Support\Str;</span>
+
+<span class="x">Str::macro(&#39;readDuration&#39;,funciton(...$text){</span>
+<span class="x">    $totalWords = str_word_count(implode(&quot;&quot;,$text));</span>
+<span class="x">    $minutesToRead = round($totalWords / 200);</span>
+
+<span class="x">    return (int)max(1,$minutesToRead);</span>
+<span class="x">});</span>
+
+<span class="x">echo Str::readDuration($post-&gt;text). &#39; min read&#39;;</span>
+</code></pre></div>
+
+<h3>Same relationship different param</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">// Get all clients related to this developer</span>
+<span class="x">public function clients(){</span>
+<span class="x">    return $this-&gt;belongsToMany(Clients::class);</span>
+<span class="x">}</span>
+
+<span class="x">// Get only local clients</span>
+<span class="x">public function clients(){</span>
+<span class="x">    return $this-&gt;belongsToMany(Clients::class)</span>
+<span class="x">            -&gt;wherePivot(&#39;is_local&#39;,true);</span>
+<span class="x">}</span>
+</code></pre></div>
+
+<h3>Get columns of a table</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">DB::getSchemaBuilder()-&gt;getColumnListing(&#39;users&#39;);</span>
+
+<span class="x">// array (</span>
+<span class="x">//   0 =&gt; &#39;id&#39;,</span>
+<span class="x">//   1 =&gt; &#39;name&#39;,</span>
+<span class="x">//   2 =&gt; &#39;username&#39;,</span>
+<span class="x">//   3 =&gt; &#39;email&#39;,</span>
+<span class="x">//   4 =&gt; &#39;email_verified_at&#39;,</span>
+<span class="x">//   5 =&gt; &#39;password&#39;,</span>
+<span class="x">//   6 =&gt; &#39;remember_token&#39;,</span>
+<span class="x">//   7 =&gt; &#39;current_team_id&#39;,</span>
+<span class="x">//   8 =&gt; &#39;profile_photo_path&#39;,</span>
+<span class="x">//   9 =&gt; &#39;github_url&#39;,</span>
+<span class="x">//   10 =&gt; &#39;linkedin_url&#39;,</span>
+<span class="x">//   11 =&gt; &#39;deleted_at&#39;,</span>
+<span class="x">//   12 =&gt; &#39;created_at&#39;,</span>
+<span class="x">//   13 =&gt; &#39;updated_at&#39;,</span>
+<span class="x">//   14 =&gt; &#39;two_factor_secret&#39;,</span>
+<span class="x">//   15 =&gt; &#39;two_factor_recovery_codes&#39;,</span>
+<span class="x">//   16 =&gt; &#39;two_factor_confirmed_at&#39;,</span>
+<span class="x">//   17 =&gt; &#39;uuid&#39;,</span>
+<span class="x">// )</span>
+</code></pre></div>
+
+<h3>Optional model attributes</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">$user = User::find(1);</span>
+
+<span class="x">// This code would cause an error if $user is null or undefined</span>
+<span class="x">$address = $user-&gt;address; // NULL</span>
+
+<span class="x">// But when the optional() function, you can avoid the error;</span>
+<span class="x">$address = optional($user)-&gt;address;</span>
+</code></pre></div>
+
+<h3>Assign an re-use var in if condition</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">// Insted of repeating</span>
+<span class="x">if($this-&gt;option(&#39;type&#39;)){</span>
+<span class="x">    $stub = &quot;/stub/contorller&#39;.{$this-&gt;option(&#39;type&#39;)}.stub&quot;;</span>
+<span class="x">}</span>
+
+<span class="x">// assign and re-use the variable</span>
+<span class="x">if($type = $this-&gt;option(&#39;type&#39;)){</span>
+<span class="x">    $stub = &quot;stub/controller.{$type}.stub&quot;;</span>
+<span class="x">}</span>
+</code></pre></div>
+
+<h3>Middleware in Controller</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">class MyController extends Controller</span>
+<span class="x">{</span>
+<span class="x">    public function getMiddleware(){</span>
+<span class="x">        return [</span>
+<span class="x">            [</span>
+<span class="x">                &#39;middleware&#39; =&gt; &#39;auth&#39;,</span>
+<span class="x">                &#39;options&#39; =&gt; []</span>
+<span class="x">            ]</span>
+<span class="x">        ];</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</code></pre></div>
+
+<h3>Clone all laravel docs locally</h3>
+<div class="codehilite"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>laravel/docs<span class="w"> </span>laravel-docs
+</code></pre></div>
+
+<p>After cloning run it like any other project.</p>
+<h3>Two paginate in one view</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">$posts = Post::with(&#39;user&#39;)</span>
+<span class="x">            -&gt;where(&#39;ai&#39;,false)</span>
+<span class="x">            -&gt;latest()</span>
+<span class="x">            -&gt;simplePaginate(perPage:10, pageName: &#39;postsPage&#39;);</span>
+
+<span class="x">$posts = Post::with(&#39;user&#39;)</span>
+<span class="x">            -&gt;where(&#39;ai&#39;,true)</span>
+<span class="x">            -&gt;latest()</span>
+<span class="x">            -&gt;simplePaginate(perPage:10, pageName: &#39;aiPostsPage&#39;);</span>
+</code></pre></div>
+
+<h3>Show soft deleted data in route</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">Route::get(&#39;/users/{user}&#39;,function(User $user){</span>
+<span class="x">    return $user-&gt;email;</span>
+<span class="x">})-&gt;withTrashed();</span>
+
+<span class="x">Route::resource(&#39;users&#39;,UserController::class)</span>
+<span class="x">    -&gt;withTrashed();</span>
+
+<span class="x">Route::resource(&#39;users&#39;,UserController::class)</span>
+<span class="x">    -&gt;withTrashed([&#39;shoe&#39;])</span>
+</code></pre></div>
+
+<h3>Benchmark database queries</h3>
+<div class="codehilite"><pre><span></span><code><span class="x">use App\Models\User;</span>
+<span class="x">use Illuminate\Support\Benchmark;</span>
+
+<span class="x">Benchmark::dd([</span>
+<span class="x">    &#39;User count 1&#39; =&gt; fn () =&gt; User::count(),</span>
+<span class="x">    &#39;User count 2&#39; =&gt; fn () =&gt; User::all()-&gt;count()</span>
+<span class="x">]);</span>
+
+<span class="x">// array:2 [ // vendor\laravel\framework\src\Illuminate\Support\Benchmark.php:48</span>
+<span class="x">//   &quot;User count 1&quot; =&gt; &quot;14.129ms&quot;</span>
+<span class="x">//   &quot;User count 2&quot; =&gt; &quot;1.299ms&quot;</span>
+<span class="x">// ]</span>
+</code></pre></div>
+
+
+    </main>
+
+    <br/>
+    <br/>
+
+
+    <footer>
+      <a class="kopimi" href="#" title="Kopimi">
+        <img class="kopimi" src="../../img/logo_dark.svg" title="SHTB Logo" />
+      </a>
+    </footer>
+
+    <script
+      type="module"
+      src="../../js/main.fucking.js"
+      type="text/javascript"
+    ></script>
+  </body>
+
+</html>
