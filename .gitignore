@@ -1,4 +1,4 @@
 /dist
 package-lock.json
 /.well-known
-/.vscode
+.vscode
