@@ -8,20 +8,20 @@
     <meta name="author" content="Shahryar Tayeb">
     <meta name="description" content="SHTB Blog">
     <link rel="alternate" href="/atom.xml" type="application/atom+xml">
-    <title> | SHTB Blog</title>
+    <title>How to Build a Polymorphic One-to-Many Factory in Laravel | SHTB Blog</title>
 
 
     <meta name="description" content="" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-      <meta property="og:description" content="SHTB Blog is an open platform where readers can find latest articles and tutorial about technology and software development." />
+      <meta property="og:description" content="In this blog post, I will guide you through the steps to create a Polymorphic One-to-Many factory in Laravel." />
 
     <meta property="og:image" content="https://blog.shahryartayeb.com/assets/images/shtb3.webp" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:description" content="SHTB Blog is an open platform where readers can find latest articles and tutorial about technology and software development." />
+      <meta property="twitter:description" content="In this blog post, I will guide you through the steps to create a Polymorphic One-to-Many factory in Laravel." />
     <meta property="twitter:image" content="https://blog.shahryartayeb.com/assets/images/shtb3.webp" />
 
 
@@ -68,6 +68,177 @@
 
     <main>
     
+<h2 id="get-started">Get started</h2>
+<p>Creating a Polymorphic relationship between models can be quite challenging. This relationship allows a single model to belong to multiple other models, which can be useful in many scenarios.
+#
+Let&#39;s take a look at one of these scenarios. 
+#
+<img src="https://blog.shahryartayeb.com/uploads/34/quickdbd-test-erd.png" alt="desc">
+#
+we have a <code>posts</code> and <code>courses</code> table each of the posts and courses can have a status so instead of creating two tables like <code>posts_status</code> and <code>courses_status</code> we can create a polymorphic one-to-many table called <code>statuses</code> and now we can attach a status for any row or table that we want.
+#
+The benefit of this approach is that, if in the future you have a lessons table and you want to assign a status to your lessons you can do it without changing your database schema.
+#
+In this article I have assumed that you know how to create migrations and models for the above tables so I will jump straight to creating the factory for <code>statuses</code> table.</p>
+<h2 id="create-factory">Create factory</h2>
+<p> As always to create a factory we run the bellow artisan command</p>
+<pre><code class="lang-shell"><span class="hljs-selector-tag">php</span> <span class="hljs-selector-tag">artisan</span> <span class="hljs-selector-tag">make</span><span class="hljs-selector-pseudo">:factory</span> <span class="hljs-selector-tag">Status</span>
+</code></pre>
+<p>The above command will create a <code>StatusFactory.php</code> file in <code>database→factories</code> directory of Laravel app.
+#
+By default the file will look something like this.</p>
+<pre><code class="lang-php"><span class="php"><span class="hljs-meta">&lt;?php</span>
+
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">Database</span>\<span class="hljs-title">Factories</span>;
+
+<span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Database</span>\<span class="hljs-title">Eloquent</span>\<span class="hljs-title">Factories</span>\<span class="hljs-title">Factory</span>;
+
+<span class="hljs-comment">/**
+ * <span class="hljs-doctag">@extends</span> \Illuminate\Database\Eloquent\Factories\Factory&lt;\App\Models\Model&gt;
+ */</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">StatusFactory</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Factory</span>
+</span>{
+    <span class="hljs-comment">/**
+     * Define the model's default state.
+     *
+     * <span class="hljs-doctag">@return</span> array&lt;string, mixed&gt;
+     */</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">definition</span><span class="hljs-params">()</span>: <span class="hljs-title">array</span>
+    </span>{
+        <span class="hljs-keyword">return</span> [
+            <span class="hljs-comment">//</span>
+        ];
+    }
+}</span>
+</code></pre>
+<p>so lets start by defining the name of the status. in this case I want the status name to be one of the bellow options.</p>
+<ul>
+<li>PUBLISHED</li>
+<li>DRAFT</li>
+<li>PENDING</li>
+<li>REJECTED</li>
+</ul>
+<p>To achieve this we will use faker’s <code>randomElement()</code> method and pass our options to it as an array.
+This will return one of the options at random each time a record is created using this factory.</p>
+<pre><code class="lang-php">....
+
+<span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">definition</span><span class="hljs-params">()</span>: <span class="hljs-title">array</span>
+</span>{
+    <span class="hljs-keyword">return</span> [
+        <span class="hljs-string">'name'</span> =&gt; <span class="hljs-keyword">$this</span>-&gt;faker-&gt;randomElement([
+                <span class="hljs-string">'PUBLISHED'</span>,
+                <span class="hljs-string">'DRAFT'</span>,
+                <span class="hljs-string">'PENDING'</span>,
+                <span class="hljs-string">'REJECTED'</span>,
+            ]),
+    ];
+}
+
+...
+</code></pre>
+<p>Next up is the <code>statusable_id</code> and <code>statusable_type</code> .
+#
+One way to do it would be to create status for only one model(like course) and whenever you are testing another model(like Post) just change the factory. but this will grow tedious and if you add more tables to polymorphic relationship, it will become hard and time consuming to change the factory every time.</p>
+<pre><code class="lang-php"><span class="hljs-keyword">return</span> [
+    <span class="hljs-string">'name'</span> =&gt; <span class="hljs-keyword">$this</span>-&gt;faker-&gt;randomElement([
+        <span class="hljs-string">'PUBLISHED'</span>,
+        <span class="hljs-string">'DRAFT'</span>,
+        <span class="hljs-string">'PENDING'</span>,
+        <span class="hljs-string">'REJECTED'</span>,
+    ]),
+    <span class="hljs-string">'statusable_id'</span> =&gt; Course::factory()-&gt;create(),
+    <span class="hljs-string">'statusable_type'</span> =&gt; <span class="hljs-string">'App\Models\Course'</span>,
+];
+</code></pre>
+<p>So let’s try a better way, start by creating another method after definition() we will call it <code>statusable</code>.</p>
+<pre><code class="lang-php"><span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">statusable</span><span class="hljs-params">()</span>
+</span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;faker-&gt;randomElement([Course::class, Post::class]);
+}
+</code></pre>
+<p>The <code>statusable</code> function uses faker’s <code>randomElement</code> and I have passed an array of the models that I want to create status for. 
+#
+If in the future I decided to attach status to Lesson model all I have to do is add the <code>Lesson::class</code> to the array.</p>
+<pre><code class="lang-php"><span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">statusable</span><span class="hljs-params">()</span>
+</span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;faker-&gt;randomElement([Course::class, Post::class,Lesson::class]);
+}
+</code></pre>
+<p>Now we have a <code>statusable</code> method , let’s get back to our <code>definition</code> method.</p>
+<pre><code class="lang-php"><span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">definition</span><span class="hljs-params">()</span>: <span class="hljs-title">array</span>
+</span>{
+    $statusable = <span class="hljs-keyword">$this</span>-&gt;statusable();
+
+    <span class="hljs-keyword">return</span> [
+        <span class="hljs-string">'name'</span> =&gt; <span class="hljs-keyword">$this</span>-&gt;faker-&gt;randomElement([
+            <span class="hljs-string">'PUBLISHED'</span>,
+            <span class="hljs-string">'DRAFT'</span>,
+            <span class="hljs-string">'PENDING'</span>,
+            <span class="hljs-string">'REJECTED'</span>,
+        ]),
+        <span class="hljs-string">'statusable_id'</span> =&gt; $statusable::factory()-&gt;create(),
+        <span class="hljs-string">'statusable_type'</span> =&gt; $statusable,
+    ];
+}
+</code></pre>
+<p>In the <code>definition</code> method we call <code>statusable</code> method to get a class from our list and in the <code>statusable_id</code> key of the array, we call <code>factory</code> method on that model to create a new model row.
+#
+In the <code>statusable_type</code> key we simply passed model class string to get the type of created statusable.
+#
+We are done with the <code>StatusFactory.php</code> and it looks something like this.</p>
+<pre><code class="lang-php"><span class="php"><span class="hljs-meta">&lt;?php</span>
+
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">Database</span>\<span class="hljs-title">Factories</span>;
+
+<span class="hljs-keyword">use</span> <span class="hljs-title">App</span>\<span class="hljs-title">Models</span>\<span class="hljs-title">Course</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-title">App</span>\<span class="hljs-title">Models</span>\<span class="hljs-title">Post</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Database</span>\<span class="hljs-title">Eloquent</span>\<span class="hljs-title">Factories</span>\<span class="hljs-title">Factory</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">StatusFactory</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Factory</span>
+</span>{
+    <span class="hljs-comment">/**
+     * Define the model's default state.
+     *
+     * <span class="hljs-doctag">@return</span> array&lt;string, mixed&gt;
+     */</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">definition</span><span class="hljs-params">()</span>: <span class="hljs-title">array</span>
+    </span>{
+        $statusable = <span class="hljs-keyword">$this</span>-&gt;statusable();
+
+        <span class="hljs-keyword">return</span> [
+            <span class="hljs-string">'name'</span> =&gt; <span class="hljs-keyword">$this</span>-&gt;faker-&gt;randomElement([
+                <span class="hljs-string">'PUBLISHED'</span>,
+                <span class="hljs-string">'DRAFT'</span>,
+                <span class="hljs-string">'PENDING'</span>,
+                <span class="hljs-string">'REJECTED'</span>,
+            ]),
+            <span class="hljs-string">'statusable_id'</span> =&gt; $statusable::factory()-&gt;create(),
+            <span class="hljs-string">'statusable_type'</span> =&gt; $statusable,
+        ];
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">statusable</span><span class="hljs-params">()</span>
+    </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;faker-&gt;randomElement([Course::class, Post::class]);
+    }
+}</span>
+</code></pre>
+<p>Let’s test our factory, as you see in the bellow screenshot that statuses table is empty. 
+#
+<img src="https://blog.shahryartayeb.com/uploads/35/capture.png.png" alt="desc">
+#
+So let’s create some row for it using our <code>StatusFactory</code>.
+#
+Open a tinker session by running <code>shell php artisan tinker in the terminal</code>. Once the tinker session is ready, run the bellow command.</p>
+<pre><code class="lang-php">$statuses = Status::factory<span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>count<span class="hljs-function"><span class="hljs-params">(<span class="hljs-number">6</span>)</span>-&gt;</span>create();
+</code></pre>
+<p>It will create 6 rows in the statuses table for us so let’s check our table and see what have we got.</p>
+<p>As you see the bellow screen shot we have status records for both <code>Post</code> and <code>Course</code> models.
+#
+<img src="https://blog.shahryartayeb.com/uploads/36/untitled.png" alt="desc">
+#</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>I hope that this blog post has provided you with the knowledge and tools needed to create your own Polymorphic factory in Laravel. Remember to always test your code thoroughly and happy coding!</p>
 
   
 

@@ -8,20 +8,20 @@
     <meta name="author" content="Shahryar Tayeb">
     <meta name="description" content="SHTB Blog">
     <link rel="alternate" href="/atom.xml" type="application/atom+xml">
-    <title> | SHTB Blog</title>
+    <title>How to install geonode-project in Ubuntu 20 | SHTB Blog</title>
 
 
     <meta name="description" content="" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-      <meta property="og:description" content="SHTB Blog is an open platform where readers can find latest articles and tutorial about technology and software development." />
+      <meta property="og:description" content="This post explains how to install the GeoNode-Project, a template project that generates a Django project with GeoNode support." />
 
     <meta property="og:image" content="https://blog.shahryartayeb.com/assets/images/shtb3.webp" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:description" content="SHTB Blog is an open platform where readers can find latest articles and tutorial about technology and software development." />
+      <meta property="twitter:description" content="This post explains how to install the GeoNode-Project, a template project that generates a Django project with GeoNode support." />
     <meta property="twitter:image" content="https://blog.shahryartayeb.com/assets/images/shtb3.webp" />
 
 
@@ -69,7 +69,156 @@
     <main>
     
 
-  
+  <h2 id="introduction">Introduction</h2>
+<h3 id="what-is-geonode">What is Geonode</h3>
+<p>GeoNode is an open-source web-based Geographic Information System (GIS). It is a powerful platform for managing, visualizing, editing and sharing geospatial data. 
+#
+GeoNode helps users rapidly publish and share geospatial data of all kinds. It also provides users with powerful tools for data analysis and visualization. 
+#
+GeoNode is designed to be a complete GIS platform and includes support for geodatabases, web mapping applications and web services. GeoNode is used by organizations around the world to help manage, analyze and share geospatial data.
+#
+<a href="https://development.demo.geonode.org/#/">Geonode Demo</a>
+#
+<img src="https://blog.shahryartayeb.com/uploads/blog/shahryar/geonode-demo.png" alt="desc"></p>
+<h3 id="what-is-geonode-project-">What is geonode-project ?</h3>
+<p>GeoNode-Project is a Django template that provides users with full Geonode support and enables developers to fully customize geonode without touching the Core Geonode code.
+#
+Geonode project is the proper way to run a customized installation of Geonode. The repository of geonode-project contains a minimal set of files following the structure of a django-project. 
+#
+Geonode itself will be installed as a requirement of your project. Inside the project structure is possible to extend, replace or modify all geonode components (e.g. css and other static files, templates, models..) and even register new django apps without touching the original Geonode code.
+#
+In this article I will show you how to setup geonode-project in your PC and start customizing Geonode.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>To install GeoNode-Project, you need to install prerequisites such as Java OpenJDK, Python 3.8, virtualenvwrapper, virtualenv, pip, and Node v14. </p>
+<p>Installation of these requirements are very easy and I will not mention it in this article.</p>
+<ul>
+<li>Java OpenJDK</li>
+<li>Python 3.8 </li>
+<li>virtualenvwrapper or virtualenv</li>
+<li>pip</li>
+<li>Node v 14</li>
+</ul>
+<pre><code class="lang-bash">sudo<span class="hljs-built_in"> add-apt-repository </span>ppa:ubuntugis/ubuntugis-unstable
+sudo apt update -y; sudo apt upgrade -y;
+</code></pre>
+<pre><code class="lang-bash">sudo apt install -y build-essential gdal-bin \
+    libxml2 libxml2-<span class="hljs-built_in">dev</span> gettext \
+    libxslt1-<span class="hljs-built_in">dev</span> libjpeg-<span class="hljs-built_in">dev</span> libpng-<span class="hljs-built_in">dev</span> libpq-<span class="hljs-built_in">dev</span> libgdal-<span class="hljs-built_in">dev</span> \
+    software-properties-common build-essential \
+    git unzip gcc zlib1g-<span class="hljs-built_in">dev</span> libgeos-<span class="hljs-built_in">dev</span> libproj-<span class="hljs-built_in">dev</span>
+</code></pre>
+<h2 id="get-started">Get Started</h2>
+<p>As for working with every Django project, first we need to create a virtual environment for our depenedencies. I have used virtualenvwrapper but you choose what you are comfortable with.</p>
+<h3 id="1-create-virtual-environment">1 - Create virtual environment</h3>
+<pre><code class="lang-bash"><span class="hljs-attribute">mkvirtualenv</span> my_geonode
+</code></pre>
+<pre><code class="lang-bash"><span class="hljs-attribute">workon</span> my_geonode
+</code></pre>
+<h3 id="2-clone-the-geonode-project-repo-from-github">2 - Clone the geonode-project repo from Github</h3>
+<p>This command will clone the GeoNode-Project repository from github to the current working directory. The -b flag is used to specify the branch of the repository that we are cloning, in this case 4.1.x. This is the branch that we need to install GeoNode-Project.</p>
+<pre><code class="lang-bash">git <span class="hljs-keyword">clone</span> <span class="hljs-title">https</span>://github.com/GeoNode/geonode-project.git -b <span class="hljs-number">4.1</span>.x
+</code></pre>
+<p>After cloning the repository go to the project and then the src folder</p>
+<pre><code class="lang-bash"><span class="hljs-built_in">cd</span> geonode-project/src
+</code></pre>
+<p>3 - Install Django framework</p>
+<pre><code class="lang-bash">pip install Django==<span class="hljs-number">3.2</span><span class="hljs-number">.13</span>
+</code></pre>
+<h3 id="4-install-requirements">4 - Install requirements</h3>
+<p>Install all the requirements for the GeoNode-Project and install the GeoNode-Project using pip</p>
+<pre><code class="lang-bash">pip <span class="hljs-keyword">install</span> -r requirements.txt <span class="hljs-comment">--upgrade</span>
+
+pip <span class="hljs-keyword">install</span> -e . <span class="hljs-comment">--upgrade</span>
+</code></pre>
+<h3 id="5-install-gdal-utilities-for-python">5 - Install GDAL Utilities for Python</h3>
+<pre><code class="lang-bash">pip <span class="hljs-keyword">install</span> pygdal==<span class="hljs-string">"`gdal-config --version`.*"</span>  # <span class="hljs-keyword">or</span> refer <span class="hljs-keyword">to</span> the <span class="hljs-keyword">link</span> &lt;<span class="hljs-keyword">Install</span> GDAL <span class="hljs-keyword">for</span> Development &lt;https://training.geonode.geo-solutions.it/<span class="hljs-number">005</span>_dev_workshop/<span class="hljs-number">004</span>_devel_env/gdal_install.html&gt;
+</code></pre>
+<h3 id="6-install-and-configure-the-postgresql-database-system-">6 - <strong><strong>Install and Configure the PostgreSQL Database System</strong></strong></h3>
+<p>Geonode uses postgresql as database. If you already have postgres database in your system you can ignore this step.</p>
+<pre><code class="lang-bash">sudo <span class="hljs-keyword">sh</span> -c 'echo <span class="hljs-string">"deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main"</span> &gt;&gt; /etc/apt/sources.<span class="hljs-keyword">list</span>.<span class="hljs-keyword">d</span>/pgdg.<span class="hljs-keyword">list</span>'
+sudo wget --<span class="hljs-keyword">no</span>-check-certificate --quiet -O - https:<span class="hljs-comment">//www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -</span>
+sudo apt <span class="hljs-keyword">update</span> -y; sudo apt install -y postgresql-13 postgresql-13-postgis-3 postgresql-13-postgis-3-scripts postgresql-13 postgresql-client-13
+</code></pre>
+<h3 id="7-databases-and-permissions-">7 - <strong><strong>Databases and Permissions</strong></strong></h3>
+<p>Create geonode user</p>
+<pre><code class="lang-bash">sudo service postgresql <span class="hljs-literal">start</span>
+sudo -u postgres createuser -P my_geonode
+
+<span class="hljs-comment"># Use the password: geonode</span>
+</code></pre>
+<p>Create my_geonode and my_geonode_data with owner my_geonode</p>
+<pre><code class="lang-bash">sudo -u postgres createdb -<span class="hljs-keyword">O</span> my_geonode my_geonode
+sudo -u postgres createdb -<span class="hljs-keyword">O</span> my_geonode my_geonode_data
+</code></pre>
+<p>create PostGIS extensions</p>
+<pre><code class="lang-bash">sudo -u postgres psql -d my_geonode -c '<span class="hljs-keyword">CREATE</span> EXTENSION postgis;'
+sudo -u postgres psql -d my_geonode -c '<span class="hljs-keyword">GRANT</span> ALL <span class="hljs-keyword">ON</span> geometry_columns <span class="hljs-keyword">TO</span> <span class="hljs-keyword">PUBLIC</span>;'
+sudo -u postgres psql -d my_geonode -c '<span class="hljs-keyword">GRANT</span> ALL <span class="hljs-keyword">ON</span> spatial_ref_sys <span class="hljs-keyword">TO</span> <span class="hljs-keyword">PUBLIC</span>;'
+sudo -u postgres psql -d my_geonode -c '<span class="hljs-keyword">GRANT</span> ALL <span class="hljs-keyword">PRIVILEGES</span> <span class="hljs-keyword">ON</span> ALL <span class="hljs-keyword">TABLES</span> <span class="hljs-keyword">IN</span> <span class="hljs-keyword">SCHEMA</span> <span class="hljs-keyword">public</span> <span class="hljs-keyword">TO</span> my_geonode;'
+
+sudo -u postgres psql -d my_geonode_data -c '<span class="hljs-keyword">CREATE</span> EXTENSION postgis;'
+sudo -u postgres psql -d my_geonode_data -c '<span class="hljs-keyword">GRANT</span> ALL <span class="hljs-keyword">ON</span> geometry_columns <span class="hljs-keyword">TO</span> <span class="hljs-keyword">PUBLIC</span>;'
+sudo -u postgres psql -d my_geonode_data -c '<span class="hljs-keyword">GRANT</span> ALL <span class="hljs-keyword">ON</span> spatial_ref_sys <span class="hljs-keyword">TO</span> <span class="hljs-keyword">PUBLIC</span>;'
+sudo -u postgres psql -d my_geonode_data -c '<span class="hljs-keyword">GRANT</span> ALL <span class="hljs-keyword">PRIVILEGES</span> <span class="hljs-keyword">ON</span> ALL <span class="hljs-keyword">TABLES</span> <span class="hljs-keyword">IN</span> <span class="hljs-keyword">SCHEMA</span> <span class="hljs-keyword">public</span> <span class="hljs-keyword">TO</span> my_geonode;'
+</code></pre>
+<p>change user access policies for local connections in the file <code>pg_hba.conf</code></p>
+<pre><code class="lang-bash">sudo nano <span class="hljs-regexp">/etc/</span>postgresql<span class="hljs-regexp">/13/m</span>ain<span class="hljs-regexp">/pg_hba.conf</span>
+</code></pre>
+<p>Scroll down to the bottom of the document. We want to make local connection <code>trusted</code> for the default user.</p>
+<p>Make sure your configuration looks like the one below.</p>
+<pre><code class="lang-bash">...
+<span class="hljs-comment"># DO NOT DISABLE!</span>
+<span class="hljs-comment"># If you change this first entry you will need to make sure that the</span>
+<span class="hljs-comment"># database superuser can access the database using some other method.</span>
+<span class="hljs-comment"># Noninteractive access to all databases is required during automatic</span>
+<span class="hljs-comment"># maintenance (custom daily cronjobs, replication, and similar tasks).</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Database administrative login by Unix domain socket</span>
+local   <span class="hljs-literal">all</span>             postgres                                trust
+
+<span class="hljs-comment"># TYPE  DATABASE        USER            ADDRESS                 METHOD</span>
+
+<span class="hljs-comment"># "local" is for Unix domain socket connections only</span>
+local   <span class="hljs-literal">all</span>             <span class="hljs-literal">all</span>                                     md5
+<span class="hljs-comment"># IPv4 local connections:</span>
+host    <span class="hljs-literal">all</span>             <span class="hljs-literal">all</span>             <span class="hljs-number">127.0</span>.<span class="hljs-number">0.1</span>/<span class="hljs-number">32</span>            md5
+<span class="hljs-comment"># IPv6 local connections:</span>
+host    <span class="hljs-literal">all</span>             <span class="hljs-literal">all</span>             ::<span class="hljs-number">1</span>/<span class="hljs-number">128</span>                 md5
+<span class="hljs-comment"># Allow replication connections from localhost, by a user with the</span>
+<span class="hljs-comment"># replication privilege.</span>
+local   replication     <span class="hljs-literal">all</span>                                     peer
+host    replication     <span class="hljs-literal">all</span>             <span class="hljs-number">127.0</span>.<span class="hljs-number">0.1</span>/<span class="hljs-number">32</span>            md5
+host    replication     <span class="hljs-literal">all</span>             ::<span class="hljs-number">1</span>/<span class="hljs-number">128</span>                 md5
+</code></pre>
+<p>Restart PostgreSQL to make the change effective.</p>
+<pre><code class="lang-bash"><span class="hljs-attribute">sudo service postgresql restart</span>
+</code></pre>
+<h3 id="8-install-geoserver-tomcat-and-run-database-migrations-using-paver">8 - Install GeoServer, Tomcat and run database migrations using paver</h3>
+<p>Before setting up paver make sure to rename these files</p>
+<ul>
+<li><p><code>src/paver_dev.sh.sample</code> → <code>paver_dev.sh</code></p>
+</li>
+<li><p><code>.override_dev_env.sample</code> → <code>.override_dev_env</code>
+#
+After renaming the files inside the src folder run the bellow commands</p>
+</li>
+</ul>
+<pre><code class="lang-bash"># Inside the src folder
+
+<span class="hljs-keyword">sh</span> ./paver_dev.<span class="hljs-keyword">sh</span> setup
+
+<span class="hljs-keyword">sh</span> ./paver_dev.<span class="hljs-keyword">sh</span> <span class="hljs-keyword">sync</span>
+</code></pre>
+<h3 id="9-start-the-project">9 - Start the project</h3>
+<p>Everytime that you wanted to run your project you have to use this command.</p>
+<pre><code class="lang-bash"><span class="hljs-comment"># Inside the src folder</span>
+
+sh ./paver_dev.sh <span class="hljs-literal">start</span>
+</code></pre>
+<h2 id="summary">Summary</h2>
+<p>For more details check the Geonode Documentation
+<a href="https://docs.geonode.org/en/master/install/advanced/project/index.html">Geonode Documentation  </a></p>
+
 
 
     </main>

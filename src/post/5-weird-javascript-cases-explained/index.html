@@ -8,7 +8,7 @@
     <meta name="author" content="Shahryar Tayeb">
     <meta name="description" content="SHTB Blog">
     <link rel="alternate" href="/atom.xml" type="application/atom+xml">
-    <title> | SHTB Blog</title>
+    <title>5 Weird JavaScript Cases Explained | SHTB Blog</title>
 
 
     <meta name="description" content="" />
@@ -69,7 +69,76 @@
     <main>
     
 
-  
+  <p>Hello, fellow JavaScript developers! Today, we will discuss some weird JavaScript cases that you might encounter while working with the language.</p>
+<h2 id="-operator">+ Operator</h2>
+<p>the &#39;+&#39; operator in JavaScript. It&#39;s crucial to know that the type of the operands involved affects the behavior of this operator.</p>
+<p>When both operands are numbers, the &#39;+&#39; operator performs addition. For example:</p>
+<pre><code class="lang-js"><span class="hljs-keyword">const</span> num1 = <span class="hljs-number">5</span>;
+<span class="hljs-keyword">const</span> num2 = <span class="hljs-number">10</span>;
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">result</span> = num1 + num2; <span class="hljs-comment">// Outputs: 15</span>
+</code></pre>
+<p>However, if one operand is a different type, like a string, it switches to concatenation. Let&#39;s see it in action:</p>
+<pre><code class="lang-js"><span class="hljs-keyword">const</span> <span class="hljs-built_in">num</span> = <span class="hljs-number">5</span>;
+<span class="hljs-keyword">const</span> str = <span class="hljs-string">"10"</span>;
+<span class="hljs-keyword">const</span> result = <span class="hljs-built_in">num</span> + str; <span class="hljs-comment">// Outputs: "510"</span>
+</code></pre>
+<p>When one of the operands is an array or an object, the + operator performs type coersion and then concatenation. Consider this expression:</p>
+<pre><code class="lang-js"><span class="hljs-symbol">1 </span>+ [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>] // <span class="hljs-comment">'11,2,3,4'</span>
+</code></pre>
+<p>In the expression <code>1 + [1,2,3,4]</code>, the first operand is a number (1) and the second operand is an array <code>[1,2,3,4]</code>. Since one of the operands is not a number, the + operator performs concatenation.</p>
+<p>When an array is concatenated with a string or a number, it is converted to a string by joining all the elements of the array with commas (,). So in this case, <code>[1,2,3,4]</code> is converted to the string <code>&quot;1,2,3,4&quot;</code>.</p>
+<p>Then, the number 1 is also converted to a string and concatenated with the string <code>&quot;1,2,3,4&quot;</code>, resulting in the string <code>&quot;11,2,3,4&quot;</code>.</p>
+<p>Therefore, the expression <code>1 + [1,2,3,4]</code> evaluates to the string <code>&quot;11,2,3,4&quot;</code>.</p>
+<p>Similarly if its an object, first object will be converted to string . Objects converts to <code>[object object]</code> .</p>
+<pre><code class="lang-js"><span class="hljs-symbol">1 </span>+ {} // <span class="hljs-comment">'1[object Object]'</span>
+</code></pre>
+<p>Takeaway: Pay attention to the types of operands when using the &#39;+&#39; operator in JavaScript. It can either perform addition or concatenation depending on the types involved.</p>
+<h2 id="-operator">- Operator</h2>
+<p>We saw that if we use ‘+’ with different type it will concatenate them.</p>
+<p>So why is </p>
+<pre><code class="lang-js"><span class="hljs-symbol">9 </span>+ <span class="hljs-comment">'1' // 91</span>
+
+<span class="hljs-symbol">91 </span>- <span class="hljs-comment">'1' // 90</span>
+</code></pre>
+<p>We know that JavaScript performs type coercion and the case of “+” is special case because of the concatenation ability.</p>
+<p>In the ‘-’ there is only one operation the subtraction so JavaScript will convert the types to number and then perform the subtraction operation.</p>
+<p>If we do it with an operand which can not be converted to number we will get <code>NaN</code></p>
+<pre><code class="lang-js"><span class="hljs-symbol">9 </span>- <span class="hljs-string">"aa1"</span> // NaN
+</code></pre>
+<h2 id="-0">[] == 0</h2>
+<pre><code class="lang-js">[] == <span class="hljs-number">0</span> <span class="hljs-comment">// true</span>
+[<span class="hljs-number">1</span>,<span class="hljs-number">2</span>] == <span class="hljs-number">0</span> <span class="hljs-comment">// false</span>
+</code></pre>
+<p>In JavaScript, the <code>==</code> operator is used for loose equality comparison. It compares two values for equality, performing type coercion if necessary.</p>
+<p>In the expression <code>[] == 0</code>, the first operand is an empty array ([]) and the second operand is the number 0. Since the operands have different types, JavaScript performs type coercion to make them comparable.</p>
+<p>During type coercion, an empty array is converted to an empty string (&quot;&quot;). Then, the empty string is converted to the number 0.</p>
+<blockquote>
+<p>💡 [1,3] This array is first converted to string which becomes the string ‘1,3’ and then &gt;it is converted to number, since it can not be converted to number the result of type coer&gt;sion is NaN.
+<code>NaN == 0</code> is <code>false</code></p>
+</blockquote>
+<p>After type coercion, the expression becomes 0 == 0. Now both operands are numbers, and JavaScript compares them for equality. In this case, both operands have the same value of 0, so the expression evaluates to true.</p>
+<p>Therefore, the expression <code>[] == 0</code> evaluates to <code>true</code>.</p>
+<h2 id="true-1-and-true-1">true == 1 and true === 1</h2>
+<p><code>true == 1</code> evaluates to true because JavaScript coerces the boolean value true to the number 1, and both operands have the same value of 1.</p>
+<p><code>true === 1</code> evaluates to false because the <code>===</code> operator performs strict equality comparison without any type coercion. The boolean value <code>true</code> and the number <code>1</code> have different types, so the expression evaluates to <code>false</code>.</p>
+<h2 id="true-true-true-3">true + true + true === 3</h2>
+<p>The boolean values true are coerced into numbers by JavaScript and are turned into 1s. Therefore</p>
+<pre><code class="lang-js"><span class="hljs-literal">true</span> + <span class="hljs-literal">true</span> + <span class="hljs-literal">true</span> === <span class="hljs-number">3</span>
+</code></pre>
+<p>becomes</p>
+<pre><code class="lang-js"><span class="hljs-symbol">1 </span>+ <span class="hljs-number">1</span> + <span class="hljs-number">1</span> === <span class="hljs-number">3</span>
+</code></pre>
+<p>which is true.
+#
+I hope that you found this blog post helpful. Happy coding!
+#</p>
+<p> #</p>
+<p> ::: warning Want to Talk</p>
+<blockquote>
+<p>Let’s start a conversation bellow, you will be completely anonymous.
+ :::</p>
+</blockquote>
+
 
 
     </main>

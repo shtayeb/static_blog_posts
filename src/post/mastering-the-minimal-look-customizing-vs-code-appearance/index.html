@@ -8,14 +8,14 @@
     <meta name="author" content="Shahryar Tayeb">
     <meta name="description" content="SHTB Blog">
     <link rel="alternate" href="/atom.xml" type="application/atom+xml">
-    <title> | SHTB Blog</title>
+    <title>Mastering the Minimal Look: Customizing VS Code Appearance | SHTB Blog</title>
 
 
-    <meta name="description" content="" />
+    <meta name="description" content="Learn how to customize the appearance of VS Code and achieve a minimalist look .Create a workspace that reflects your personal style and enhances your coding experience. Read on for tips and tricks." />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-      <meta property="og:description" content="SHTB Blog is an open platform where readers can find latest articles and tutorial about technology and software development." />
+      <meta property="og:description" content="Learn how to customize the appearance of VS Code and achieve a minimalist look .Create a workspace that reflects your personal style and enhances your coding experience. Read on for tips and tricks." />
 
     <meta property="og:image" content="https://blog.shahryartayeb.com/assets/images/shtb3.webp" />
     
@@ -69,7 +69,121 @@
     <main>
     
 
-  
+  <h2 id="let-s-begin">Let&#39;s begin</h2>
+<p>Hey there, fellow programmers and code enthusiasts! 
+#
+VS code is the best lightweight code editor and is very popular among developers despite it being a lightweight setup, most of us do not need to see all the available features and panels,so in this blog post I will try to minimize the distractions and remove the unused panels/windows from VS code. this is possible thanks to VS code customizability and usage of shortcuts. Yes we dont want the distraction of clattered but we will still be able to use them or hide/unhide them using shortcuts.
+#
+So dont be afraid and make your setup as minimal as possible so that you can focus on what is important: writing code and solving problems.
+#
+The default VS code setup will look something like the bellow screenshot.
+grab your favorite beverage, sit back, and let&#39;s dive into the world of VS Code customization!
+#
+<img src="https://blog.shahryartayeb.com/uploads/23/conversions/tv---1-webp.webp" alt="desc">
+#</p>
+<h2 id="color-theme">Color / Theme</h2>
+<p>The quickest and easiest way to customize VS code appearance is by installing a theme from the extension store.</p>
+<p>So let’s install one
+#</p>
+<h3 id="install-color-theme">Install Color Theme</h3>
+<p>I am going with <code>Monokai Pro</code> but it is personal choice you can download any theme that you like.</p>
+<p>head to Extensions <code>Ctrl + Shift + x</code> and search for your favorite theme. In my case I am going for <code>Monokai Pro</code> and click the install button.
+#
+<img src="https://blog.shahryartayeb.com/uploads/24/conversions/tv---2-webp.webp" alt="desc">
+#</p>
+<h3 id="change-the-theme">Change the theme</h3>
+<p>After the installation is complete go to FIile → Preferences → Color Theme and click on it.
+#
+<img src="https://blog.shahryartayeb.com/uploads/25/conversions/tv---3-webp.webp" alt="desc">
+#
+You see a dropdown with all of your installed themes. 
+#
+Scroll down and choose Monokai Pro.
+#
+You will get a preview of how the theme will look like when you scroll down the dropdown.
+#
+<img src="https://blog.shahryartayeb.com/uploads/26/conversions/tv---4-webp.webp" alt="desc">
+#
+After applying the theme your editor will look a lot better than the default look.</p>
+<h2 id="install-icon-theme">Install Icon Theme</h2>
+<p>The Monokai Pro come with its own icon theme but the color theme that you choose might not include an icon theme by default so in that case you need to install an Icons Theme yourself.
+#
+luckily it is as easy as installing the Color Theme.
+#
+Search for your Icon Theme and install it. The same activation process can be applied to Icon themes as well
+#
+lets make some more changes</p>
+<h2 id="install-product-icon-theme">Install Product Icon Theme</h2>
+<p>product icons theme will change the VS code system icons like explorer, git and etc.
+#
+ <a href="https://marketplace.visualstudio.com/items?itemName=antfu.icons-carbon">Carbon Product Icons</a></p>
+<h2 id="install-font">Install Font</h2>
+<p>When it comes to customizing your VS Code appearance, choosing the right coding font can make a huge difference in readability and overall aesthetics. The wrong font can strain your eyes and distract you from your code, while the right font can enhance your experience and make your code pop.
+#
+Some popular and free coding fonts are <code>Cascadia Code</code> and <code>JetBrains Mono</code> . I will use <code>Cascadia Code</code>  for this tutorial.
+#
+Installing the fonts differs depending on your Operating system but it is easy just search for it in google you can install a new font in a few steps.
+#
+<a href="https://github.com/microsoft/cascadia-code/releases">Cascadia Code</a>
+#
+<a href="https://www.jetbrains.com/lp/mono/">JetBrains Mono</a>
+#</p>
+<h3 id="change-the-font-in-the-vscode-settings">Change the font in the Vscode settings</h3>
+<p>We have installed the font in our system so now lets tell VS code to use that font.
+#
+Go to Settings of you VS code by pressing(Control and Comma)  <code>ctrl + ,</code> and in the top search bar type font and make the bellow changes.</p>
+<ul>
+<li>Change the <code>Editor: Font Family</code> to <code>Cascadia Code</code></li>
+<li>Change the <code>Editor: Font Size</code> to <code>16</code></li>
+</ul>
+<p><img src="https://blog.shahryartayeb.com/uploads/27/conversions/tv---6-webp.webp" alt="desc">
+#</p>
+<ul>
+<li><p>Click on the Edit in <code>settings.json</code> in the <code>Editor: Font Weight</code> section.</p>
+<p>  set the <code>fontWeight</code> to <code>600</code></p>
+</li>
+</ul>
+<pre><code class="lang-json">{
+    <span class="hljs-attr">"editor.fontFamily"</span>: <span class="hljs-string">"Cascadia Code"</span>,
+    <span class="hljs-attr">"editor.fontSize"</span>: <span class="hljs-number">16</span>,
+    <span class="hljs-attr">"editor.fontWeight"</span>: <span class="hljs-string">"600"</span>
+}
+</code></pre>
+<ul>
+<li><p>Change the Editor: Line Height to 1.8
+#
+<img src="https://blog.shahryartayeb.com/uploads/28/conversions/tv---7-webp.webp" alt="desc">
+#</p>
+<h2 id="let-s-cleanup-some-of-the-windows-panels">let’s cleanup some of the windows/panels</h2>
+<p>Go to the View -&gt; Appearance and deactivate all these windows and panels</p>
+</li>
+<li><p>Menu Bar</p>
+</li>
+<li>Status Bar</li>
+<li>Secondary Sidebar</li>
+<li>Minimap</li>
+<li>Breadcrumbs</li>
+<li>Render whitespace
+#
+<img src="https://blog.shahryartayeb.com/uploads/29/conversions/tv---8-webp.webp" alt="desc">
+#<h2 id="cleanup-the-activity-bar">Cleanup the activity bar</h2>
+Activity bar is the left most vertical side bar in VS code window.</li>
+</ul>
+<p>Disable the unused features. You can always use the shortcut to jump to those panels later</p>
+<ul>
+<li>Run and debug</li>
+<li>Extensions</li>
+<li>Accounts</li>
+<li>Check hide the activity bar
+<img src="https://blog.shahryartayeb.com/uploads/31/conversions/tv---9-webp.webp" alt="desc">
+#</li>
+</ul>
+<p>After our changes, our setup will look like this to switch  between File View you can use ctrl + b
+#
+<img src="https://blog.shahryartayeb.com/uploads/32/conversions/tv---10-webp.webp" alt="desc">
+#</p>
+<p>And that&#39;s a wrap, folks! I hope you enjoyed guide to customizing VS Code for a minimalist look. By now, you should have the tools and know-how to create a workspace that maximizes your productivity and creativity,  Happy coding!</p>
+
 
 
     </main>

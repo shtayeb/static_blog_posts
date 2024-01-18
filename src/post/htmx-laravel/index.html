@@ -8,20 +8,20 @@
     <meta name="author" content="Shahryar Tayeb">
     <meta name="description" content="SHTB Blog">
     <link rel="alternate" href="/atom.xml" type="application/atom+xml">
-    <title> | SHTB Blog</title>
+    <title>HTMX + Laravel: A Step-by-Step Guide | SHTB Blog</title>
 
 
     <meta name="description" content="" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-      <meta property="og:description" content="SHTB Blog is an open platform where readers can find latest articles and tutorial about technology and software development." />
+      <meta property="og:description" content="Learn how to integrate HTMX with Laravel and access modern browser features directly from HTML. Boost your web development!" />
 
     <meta property="og:image" content="https://blog.shahryartayeb.com/assets/images/shtb3.webp" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:description" content="SHTB Blog is an open platform where readers can find latest articles and tutorial about technology and software development." />
+      <meta property="twitter:description" content="Learn how to integrate HTMX with Laravel and access modern browser features directly from HTML. Boost your web development!" />
     <meta property="twitter:image" content="https://blog.shahryartayeb.com/assets/images/shtb3.webp" />
 
 
@@ -69,7 +69,186 @@
     <main>
     
 
-  
+  <h2 id="what-is-htmx-">What is htmx ?</h2>
+<p>htmx is a library that allows you to access modern browser features directly from HTML, rather than using javascript.</p>
+<p>htmx extends and generalizes the core idea of HTML as a hypertext, opening up many more possibilities directly within the language:</p>
+<ul>
+<li>Now any element, not just anchors and forms, can issue an HTTP request</li>
+<li>Now any event, not just clicks or form submissions, can trigger requests</li>
+<li>Now any <a href="https://en.wikipedia.org/wiki/HTTP_Verbs">HTTP verb</a>, not just <code>GET</code> and <code>POST</code>, can be used</li>
+<li>Now any element, not just the entire window, can be the target for update by the request</li>
+</ul>
+<p>When you are using htmx, on the server side you typically respond with <em>HTML</em>, not <em>JSON</em>.</p>
+<h2 id="get-started">Get Started</h2>
+<p>Install a fresh Laravel app by running the bellow commands</p>
+<div class="mockup-code">
+
+<code>bash
+composer create-project laravel/laravel example-app
+
+# Install composer and node dependencies
+composer install &amp;&amp; npm install
+
+# Run the server
+php artisan serve
+
+# Start vite server
+npm run dev</code>
+</div>
+
+<p>by default Laravel has vite and npm set up for us already so we don’t need to configure anything extra.</p>
+<h3 id="install-htmx">Install Htmx</h3>
+<p>We can install Htmx in two ways:</p>
+<ol>
+<li>Htmx is a dependency-free, browser-oriented JavaScript library. This means that using it is as simple as adding a <code>&lt;script&gt;</code> tag to your document head.</li>
+<li>Using npm package. </li>
+</ol>
+<p>For purpose of this article we will use the npm package.</p>
+<div class="mockup-code">
+
+<code>bash
+npm install htmx.org</code>
+
+</div>
+
+<p>Let’s add Htmx to our <code>resources/js/app.js</code></p>
+<pre><code class="lang-js"><span class="hljs-keyword">import</span> htmx <span class="hljs-keyword">from</span> <span class="hljs-string">"htmx.org"</span>;
+
+<span class="hljs-built_in">window</span>.htmx = htmx;
+</code></pre>
+<h2 id="front-end-setup">Front-end Setup</h2>
+<p>Create a form and include JavaScript file in the welcome page</p>
+<p>```html {9,21-23,25,32-33}
+&lt;!DOCTYPE html&gt;</p>
+<p><html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1"></p>
+<pre><code>    &lt;title&gt;<span class="hljs-type">Laravel</span>&lt;/title&gt;
+
+            <span class="hljs-meta">@vite</span>([<span class="hljs-symbol">'resources</span>/js/app.js'])
+
+    &lt;/head&gt;
+    &lt;body <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"antialiased"</span>&gt;
+
+    &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"relative sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white"</span>&gt;
+        &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"max-w-7xl mx-auto sm:px-6 lg:px-8"</span>&gt;
+            &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"bg-white dark:bg-gray-800 rounded-lg"</span>&gt;
+                &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"p-6 text-gray-900  dark:text-gray-100"</span>&gt;
+
+                    &lt;form 
+                                                  hx-post=<span class="hljs-string">"/name"</span> 
+                                                  hx-target=<span class="hljs-string">"#names"</span> 
+                                                  hx-swap=<span class="hljs-string">"beforeend"</span>
+                                             &gt;
+                        <span class="hljs-meta">@csrf</span>
+                        &lt;input <span class="hljs-class"><span class="hljs-keyword">type</span></span>=<span class="hljs-string">"text"</span> name=<span class="hljs-string">"name"</span> <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">" shadow-2xl text-gray-900 rounded-lg p-6 placehoder:text-gray-400"</span>
+                            placeholder=<span class="hljs-string">"Enter your name"</span>&gt;
+                        &lt;input <span class="hljs-class"><span class="hljs-keyword">type</span></span>=<span class="hljs-string">"submit"</span> <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"shadow-2xl dark:bg-gray-900 text-gray-500 p-6 rounded-lg cursor-pointer"</span> /&gt;
+                    &lt;/form&gt;
+
+                                        {{-- <span class="hljs-type">New</span> item are added inside <span class="hljs-keyword">this</span> div --}}
+                    &lt;div id=<span class="hljs-string">"names"</span> <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">""</span>&gt;
+                    &lt;/div&gt;
+
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+&lt;/body&gt;
+</code></pre><p></html></p>
+<pre><code>
+- `hx-post` - Issues a `POST` request to the given URL
+- `hx-target` - is a CSS selector and specifies the elemetn that the respnse should be loaded into.
+- `hx-swap` - specifies how Htmx swaps the HTML returned into the DOM.
+
+    Other available options are innerHTML, outerHTML,afterbegin and etc. to see the full list <span class="hljs-keyword">check</span> the Htmx documentation [here](https://htmx.org/docs/#swapping).
+
+
+<span class="hljs-keyword">After</span> adding the <span class="hljs-keyword">form</span> <span class="hljs-keyword">to</span> dashboard page we will have a setup <span class="hljs-keyword">like</span> this.
+#
+![<span class="hljs-keyword">desc</span>](https://blog.shahryartayeb.com/uploads/<span class="hljs-number">61</span>/conversions/untitled-webp.webp)
+
+#
+### <span class="hljs-keyword">Create</span> Htmx <span class="hljs-keyword">partial</span>
+
+<span class="hljs-keyword">As</span> I mentioned above, we should <span class="hljs-keyword">return</span> Html response <span class="hljs-keyword">for</span> Htmx <span class="hljs-keyword">to</span> <span class="hljs-keyword">add</span> <span class="hljs-keyword">to</span> the DOM so a typical reponse <span class="hljs-keyword">for</span> Htmx should <span class="hljs-keyword">always</span> be html.
+
+We can pass this <span class="hljs-keyword">as</span> a <span class="hljs-keyword">string</span> <span class="hljs-keyword">from</span> the controller method <span class="hljs-keyword">or</span> <span class="hljs-keyword">create</span> a <span class="hljs-keyword">template</span> <span class="hljs-keyword">for</span> it.
+
+<span class="hljs-keyword">In</span> my opinion the <span class="hljs-keyword">template</span> method <span class="hljs-keyword">is</span> clean <span class="hljs-keyword">and</span> I will be <span class="hljs-keyword">using</span> that method <span class="hljs-keyword">in</span> this article.
+
+<span class="hljs-keyword">Of</span> course you should <span class="hljs-keyword">always</span> experiment <span class="hljs-keyword">when</span> learning <span class="hljs-keyword">new</span> tools.
+
+<span class="hljs-keyword">Now</span> we have our <span class="hljs-keyword">form</span> <span class="hljs-keyword">in</span> the dashboard page <span class="hljs-keyword">and</span> ready <span class="hljs-keyword">to</span> <span class="hljs-keyword">create</span> the <span class="hljs-keyword">partial</span> <span class="hljs-keyword">for</span> Htmx response.
+
+<span class="hljs-keyword">Create</span> a folder named partials <span class="hljs-keyword">in</span> the resources folder.
+
+&lt;<span class="hljs-keyword">div</span> <span class="hljs-keyword">class</span>=<span class="hljs-string">"mockup-code"</span>&gt;
+
+
+<span class="hljs-string">``</span><span class="hljs-string">`shell {9}
+resources
+├── css
+│   └── app.css
+├── js
+│   ├── app.js
+│   └── bootstrap.js
+└── views
+    ├── partials
+    │   └── name.blade.php
+    └── welcome.blade.php</span>
+</code></pre><p></div></p>
+<p><code>name.blade.php</code></p>
+<pre><code class="lang-php">
+&lt;<span class="hljs-keyword">div</span> <span class="hljs-built_in">class</span>=<span class="hljs-string">"p-6"</span>&gt;
+    Welcome {{$<span class="hljs-built_in">name</span>}}
+&lt;/<span class="hljs-keyword">div</span>&gt;
+</code></pre>
+<h2 id="back-end-setup">Back-end Setup</h2>
+<p>We have all we need in the front-end side so let’s create all the necessary back-end files.
+#
+<strong>Create a controller</strong></p>
+<div class="mockup-code">
+
+
+<code>bash
+php artisan make:controller NameController</code>
+
+</div>
+
+<p>#
+In the <code>NameController.php</code> add a method called <code>store</code> and return the html partial that we created above.
+#
+```php {15}</p>
+<p>&lt;?php</p>
+<p>namespace App\Http\Controllers;</p>
+<p>use Illuminate\Http\Request;</p>
+<p>class NameController extends Controller
+{
+    public function store(Request $request) {</p>
+<pre><code>  <span class="hljs-comment">// Logic and Database Operations</span>
+
+    <span class="hljs-keyword">return</span> view(<span class="hljs-string">'partials.name'</span>,[
+        <span class="hljs-string">'name'</span> =&gt; $request-&gt;name
+    ]);
+}
+</code></pre><p>}</p>
+<pre><code>
+**Create Htmx route**
+
+Open routes/web.php file and add the bellow <span class="hljs-keyword">code</span> to it.
+#
+`routes/web.php`
+```php
+use App\Http\Controllers\NameController;
+
+Route::post(<span class="hljs-string">'/name'</span>, [NameController::<span class="hljs-keyword">class</span>, <span class="hljs-string">'store'</span>])-&gt;name(<span class="hljs-string">'name.store'</span>);
+</code></pre><p>This will register the post route that Htmx is sending request to.</p>
+<h2 id="result">Result</h2>
+<p><img src="https://blog.shahryartayeb.com/uploads/blog/new.gif" alt="Screenshot"></p>
+
 
 
     </main>

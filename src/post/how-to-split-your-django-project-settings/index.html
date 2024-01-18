@@ -69,7 +69,203 @@
     <main>
     
 
-  
+  <h2 id="open-source-example">Open Source Example</h2>
+<ul>
+<li>Wagtail CMS Demo  - <a href="https://github.com/wagtail/bakerydemo">bakerydemo</a>
+#<h2 id="related-articles">Related Articles</h2>
+</li>
+<li><a href="https://blog.shahryartayeb.com/post/automatically-generate-erd-of-your-django-models">Automatically Generate ERD of Your Django Models</a></li>
+<li><a href="https://blog.shahryartayeb.com/post/how-to-setup-vite-js-with-django-4x">How to Setup Vite Js With Django 4.x</a></li>
+</ul>
+<p>#</p>
+<h2 id="introduction">Introduction</h2>
+<p>In this blog post, You will learn how to modularize your Django project settings file to make it easier to support multiple environments such as local and production. We&#39;ll also learn how to switch between these settings files easily based on env variable.
+#
+In a Django project, we typically have one settings file for local and production environments but it is not ideal to use one settings for both of those environment because these environments have different requirements and configurations.</p>
+<p>The local environment is where we develop and test our code. It usually runs on our local machine and has different settings compared to the production environment. For example, we might use a different database or debugging tools (<a href="https://django-debug-toolbar.readthedocs.io/en/latest/installation.html">django-debug-toolbar</a>, <a href="https://github.com/jmcarp/nplusone">nplusone</a>) to make it easier to develop and test our code.</p>
+<p>On the other hand, the production environment is where our code is deployed and used by real users. It requires more security, stability than the local environment. We might use different settings for the database, caching, logging, and other services to ensure that our application runs smoothly and securely.</p>
+<p>By having different settings for local and production environments, we can ensure that our code works well in both scenarios and avoid any unexpected issues when we deploy our code to production.</p>
+<h2 id="create-django-project">Create Django project</h2>
+<p>In this article I will start with a fresh Django install but you can apply this steps in an existing project as well without any major changes.</p>
+<div class="mockup-code">
+
+<code>bash
+# Create new django project
+django-admin startproject mysite
+
+# Create a virtual environment
+virtualenv .venv
+
+# Activate the virtual environment
+source .venv/bin/activate # Linux
+.venv/scripts/activate # Windows
+
+# Install Django in virtual environment
+pip install django</code>
+
+</div>
+
+<p>This will create the bellow files and directories.</p>
+<div class="mockup-code">
+
+<code>📦mysite
+ ┣ 📜__init__.py
+ ┣ 📜asgi.py
+ ┣ 📜settings.py
+ ┣ 📜urls.py
+ ┗ 📜wsgi.py</code>
+
+</div>
+
+<p>We only have one settings file for our production and local environment.</p>
+<h2 id="let-s-start">Let’s Start</h2>
+<ul>
+<li>Create a folder called <code>settings</code> in mysite directory </li>
+<li>rename <a href="http://settings.py"><code>settings.py</code></a> to <code>base.py</code> and move it to settings folder</li>
+</ul>
+<p>Create the bellow three files in the settings folder</p>
+<ul>
+<li><code>__init__.py</code></li>
+<li><code>local.py</code></li>
+<li><code>production.py</code></li>
+</ul>
+<p>We will have the bellow folder structure.</p>
+<div class="mockup-code">
+
+<code>📦...
+ ┣
+📦mysite
+ ┣ 📂settings
+ ┃ ┣ 📜__init__.py
+ ┃ ┣ 📜base.py
+ ┃ ┣ 📜local.py
+ ┃ ┗ 📜production.py
+ ┣ 📜__init__.py
+ ┣ 📜asgi.py
+ ┣ 📜urls.py
+ ┗ 📜wsgi.py
+📦...
+ ┣</code>
+
+</div>
+
+<p>In the <a href="http://local.py"><code>local.py</code></a> file import the base settings and add the settings that are specific to our local environment.</p>
+<pre><code class="lang-python">from .base <span class="hljs-built_in">import</span> *
+
+<span class="hljs-attr">LOCAL_INSTALLED_APPS</span> = [
+    <span class="hljs-string">"debug_toolbar"</span>,
+]
+
+<span class="hljs-comment"># Concatinate the local apps to the installed apps list of our base settings</span>
+<span class="hljs-attr">INSTALLED_APPS</span> = INSTALLED_APPS + LOCAL_INSTALLED_APPS
+
+<span class="hljs-attr">DATABASES</span> = {
+    <span class="hljs-string">"sqlite"</span>: {
+        <span class="hljs-string">"ENGINE"</span>: <span class="hljs-string">"django.db.backends.sqlite3"</span>,
+        <span class="hljs-string">"NAME"</span>: BASE_DIR / <span class="hljs-string">"db.sqlite3"</span>,
+    },
+}
+</code></pre>
+<p>In the above file we have created a new list of installed apps and concatenate the LOCAL_INSTALLED_APPS to the INSTALLED_APPS list of our base settings.</p>
+<p>The same way you can append or remove any settings of our app according to our environment needs.</p>
+<p>For example:</p>
+<p>In the <a href="http://production.py"><code>production.py</code></a>  we want to use MySQL so we overwrite the default database in our production settings.</p>
+<pre><code class="lang-python">from .base <span class="hljs-keyword">import</span> *
+
+DATABASES = {
+    <span class="hljs-string">"default"</span>: {
+        <span class="hljs-string">"ENGINE"</span>: <span class="hljs-string">"django.db.backends.mysql"</span>,
+        <span class="hljs-string">"NAME"</span>: env(<span class="hljs-string">"DB_NAME"</span>, <span class="hljs-keyword">default</span>=<span class="hljs-string">"test"</span>),
+        <span class="hljs-string">"USER"</span>: env(<span class="hljs-string">"DB_USER"</span>, <span class="hljs-keyword">default</span>=<span class="hljs-string">"root"</span>),
+        <span class="hljs-string">"PASSWORD"</span>: env(<span class="hljs-string">"DB_PASSWORD"</span>, <span class="hljs-keyword">default</span>=<span class="hljs-string">""</span>),
+        <span class="hljs-string">"HOST"</span>: env(<span class="hljs-string">"DB_HOST"</span>, <span class="hljs-keyword">default</span>=<span class="hljs-string">"localhost"</span>),
+        <span class="hljs-string">"PORT"</span>: env(<span class="hljs-string">"DB_PORT"</span>, <span class="hljs-keyword">default</span>=<span class="hljs-string">"3306"</span>),
+        <span class="hljs-string">"OPTIONS"</span>: {<span class="hljs-string">"charset"</span>: <span class="hljs-string">"utf8mb4"</span>},
+    },
+}
+</code></pre>
+<h2 id="setup-env-">Setup <code>.env</code></h2>
+<p>Next, we&#39;ll set up our local environment variables. We use <a href="https://django-environ.readthedocs.io/en/latest/install.html">django-environ</a> to help with this. It reads environment variables located in a file named <code>.env</code> in the top level directory of the project. The only variable we need to start with is <code>DJANGO_SETTINGS_MODULE</code>:</p>
+<div class="mockup-code">
+
+<code>bash
+pip install django-environ
+
+# create .env file
+touch .env</code>
+
+</div>
+
+<p>Add the bellow variable in our .env file</p>
+<pre><code class="lang-python"><span class="hljs-attr">DJANGO_SETTINGS_MODULE</span> = <span class="hljs-string">"mysite.settings.local"</span>
+</code></pre>
+<h3 id="read-env-in-base-py-">Read <code>.env</code> in <code>base.py</code></h3>
+<p>Read the env file in our base settings file</p>
+<pre><code class="lang-python"><span class="hljs-comment"># base.py</span>
+
+import environ
+
+<span class="hljs-comment"># Build paths inside the project like this: BASE_DIR / 'subdir'.</span>
+BASE_DIR = Path(<span class="hljs-keyword">__file__</span>).resolve().<span class="hljs-keyword">parent</span>.<span class="hljs-keyword">parent</span>.<span class="hljs-keyword">parent</span>
+
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, <span class="hljs-string">".env"</span>))
+</code></pre>
+<p>Since we moved the settings file inside a folder we need to add one more .parent to the BASE_DIR</p>
+<p><code>BASE_DIR = Path(**file**).resolve().parent.parent.parent</code></p>
+<p>Specify which settings file (local or production) you want to use.</p>
+<p><code>mysite/settings/base.py</code></p>
+<pre><code class="lang-python"><span class="hljs-comment"># base.py</span>
+<span class="hljs-attr">DJANGO_SETTINGS_MODULE</span> = env(<span class="hljs-string">"DJANGO_SETTINGS_MODULE"</span>, default=<span class="hljs-string">"mysite.settings.local"</span>)
+</code></pre>
+<p>Now we tell our app to use our specified Setting Modules in the <a href="http://manage.py"><code>manage.py</code></a> file at the root of the project.</p>
+<p>import DJANGO_SETTINGS_MODULE environment from base settings file</p>
+<pre><code class="lang-python"><span class="hljs-comment"># manage.py </span>
+<span class="hljs-keyword">from</span> core.settings.base <span class="hljs-keyword">import</span> DJANGO_SETTINGS_MODULE
+</code></pre>
+<p>The final <code>manage.py</code> will look something like this</p>
+<p><code>manage.py</code></p>
+<pre><code class="lang-python"><span class="hljs-comment">#!/usr/bin/env python</span>
+<span class="hljs-string">"""Django's command-line utility for administrative tasks."""</span>
+<span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">import</span> sys
+
+<span class="hljs-keyword">from</span> core.settings.base <span class="hljs-keyword">import</span> DJANGO_SETTINGS_MODULE
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span><span class="hljs-params">()</span>:</span>
+    <span class="hljs-string">"""Run administrative tasks."""</span>
+    os.environ.setdefault(<span class="hljs-string">'DJANGO_SETTINGS_MODULE'</span>, <span class="hljs-string">'mysite.settings.local'</span>)
+    <span class="hljs-keyword">try</span>:
+        <span class="hljs-keyword">from</span> django.core.management <span class="hljs-keyword">import</span> execute_from_command_line
+    <span class="hljs-keyword">except</span> ImportError <span class="hljs-keyword">as</span> exc:
+        <span class="hljs-keyword">raise</span> ImportError(
+            <span class="hljs-string">"Couldn't import Django. Are you sure it's installed and "</span>
+            <span class="hljs-string">"available on your PYTHONPATH environment variable? Did you "</span>
+            <span class="hljs-string">"forget to activate a virtual environment?"</span>
+        ) <span class="hljs-keyword">from</span> exc
+    execute_from_command_line(sys.argv)
+
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">'__main__'</span>:
+    main()
+</code></pre>
+<p>Now when we start the development server, Django will use our specified settings file.</p>
+<div class="mockup-code">
+
+<code>bash
+❯ pm runserver
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+July 31, 2023 - 09:53:26
+Django version 4.2.2, using settings &#39;mysite.settings.local&#39;
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.</code>
+
+</div>
+
+<p>#</p>
+
 
 
     </main>

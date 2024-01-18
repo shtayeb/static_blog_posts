@@ -8,20 +8,20 @@
     <meta name="author" content="Shahryar Tayeb">
     <meta name="description" content="SHTB Blog">
     <link rel="alternate" href="/atom.xml" type="application/atom+xml">
-    <title> | SHTB Blog</title>
+    <title>Full CRUD App with HTMX and Laravel | SHTB Blog</title>
 
 
     <meta name="description" content="" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-      <meta property="og:description" content="SHTB Blog is an open platform where readers can find latest articles and tutorial about technology and software development." />
+      <meta property="og:description" content="Learn to build a dynamic Todo app with Laravel, HTMX. featuring real-time create, update, and delete operations." />
 
     <meta property="og:image" content="https://blog.shahryartayeb.com/assets/images/shtb3.webp" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:description" content="SHTB Blog is an open platform where readers can find latest articles and tutorial about technology and software development." />
+      <meta property="twitter:description" content="Learn to build a dynamic Todo app with Laravel, HTMX. featuring real-time create, update, and delete operations." />
     <meta property="twitter:image" content="https://blog.shahryartayeb.com/assets/images/shtb3.webp" />
 
 
@@ -69,7 +69,425 @@
     <main>
     
 
-  
+  <h2 id="introduction">Introduction</h2>
+<p>In this tutorial, we will be creating a simple Todo application using Laravel, HTMX, and Tailwind CSS. This application will allow us to create, update, and delete todos without having to refresh the page. Let&#39;s get started!</p>
+<h2 id="project-setup">Project Setup</h2>
+<p>First, we need to create a new Laravel project. Open your terminal and run the following commands:</p>
+<pre><code class="lang-bash"><span class="hljs-string">composer </span><span class="hljs-built_in">create-project</span> <span class="hljs-string">laravel/</span><span class="hljs-string">laravel </span><span class="hljs-string">laravel-htmx-</span><span class="hljs-string">todo
+</span>
+<span class="hljs-string">cd </span><span class="hljs-string">laravel-htmx-</span><span class="hljs-string">todo
+</span>
+<span class="hljs-string">composer </span><span class="hljs-string">install</span>
+</code></pre>
+<p><strong>Setup Database</strong><br>#</p>
+<p>For this tutorial, we will be using SQLite as our database. Open your .env file and update the database configuration as follows</p>
+<pre><code class="lang-bash">DB_CONNECTION=sqlite
+<span class="hljs-meta">#DB_HOST=127.0.0.1</span>
+<span class="hljs-meta">#DB_PORT=3306</span>
+
+<span class="hljs-meta">#DB_DATABASE=laravel</span>
+<span class="hljs-meta">#DB_USERNAME=root</span>
+<span class="hljs-meta">#DB_PASSWORD=</span>
+</code></pre>
+<p><strong>Create Model</strong>
+#</p>
+<p>Next, we need to create a model for our todos. We will also create a migration and a controller for our model. Run the following command:</p>
+<pre><code class="lang-bash"><span class="hljs-selector-tag">php</span> <span class="hljs-selector-tag">artisan</span> <span class="hljs-selector-tag">make</span><span class="hljs-selector-pseudo">:model</span> <span class="hljs-selector-tag">Todo</span> <span class="hljs-selector-tag">-mc</span>
+</code></pre>
+<p>This command will create a Todo model, a migration file for creating the todos table and a TodoController.</p>
+<p>```bash {7,11,18}
+app
+├───Console
+├───Exceptions
+├───Http
+│   ├───Controllers
+│   │       ...
+│   │       TodoController.php
+│   └───Middleware
+│
+├───Models
+│       Todo.php
+│       User.php
+└───Providers
+...
+├───factories
+├───migrations
+│     ...
+│       2023_09_19_062712_create_todos_table.php
+└───seeders</p>
+<pre><code>
+**Todo table migration**
+<span class="hljs-comment">#</span>
+
+Open the migration file <span class="hljs-keyword">and</span> update it <span class="hljs-keyword">as</span> follows:
+
+```php {<span class="hljs-number">17</span><span class="hljs-number">-18</span>}
+<span class="hljs-meta">&lt;?php</span>
+
+<span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Database</span>\<span class="hljs-title">Migrations</span>\<span class="hljs-title">Migration</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Database</span>\<span class="hljs-title">Schema</span>\<span class="hljs-title">Blueprint</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Support</span>\<span class="hljs-title">Facades</span>\<span class="hljs-title">Schema</span>;
+
+<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Migration</span>
+</span>{
+    <span class="hljs-comment">/**
+     * Run the migrations.
+     */</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">up</span><span class="hljs-params">()</span>: <span class="hljs-title">void</span>
+    </span>{
+        Schema::create(<span class="hljs-string">'todos'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(Blueprint $table)</span> </span>{
+            $table-&gt;id();
+
+            $table-&gt;string(<span class="hljs-string">'name'</span>);
+                $table-&gt;boolean(<span class="hljs-string">'is_completed'</span>)-&gt;default(<span class="hljs-keyword">false</span>);
+
+            $table-&gt;timestamps();
+        });
+    }
+
+    <span class="hljs-comment">/**
+     * Reverse the migrations.
+     */</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">down</span><span class="hljs-params">()</span>: <span class="hljs-title">void</span>
+    </span>{
+        Schema::dropIfExists(<span class="hljs-string">'todos'</span>);
+    }
+};
+</code></pre><p>This migration will create a todos table with id, name, is_completed, and timestamps fields.</p>
+<p><strong>Todo model</strong>
+#</p>
+<p>Open the Todo model and update it as follows:</p>
+<p>```php {12}
+&lt;?php</p>
+<p>namespace App\Models;</p>
+<p>use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;</p>
+<p>class Todo extends Model
+{
+    use HasFactory;</p>
+<pre><code><span class="hljs-keyword">protected</span> $fillable = <span class="hljs-meta">[</span><span class="hljs-string">'name'</span>,<span class="hljs-string">'is_completed'</span><span class="hljs-meta">]</span>;
+</code></pre><p>}</p>
+<pre><code>
+This model allows <span class="hljs-keyword">us</span> to interact with our todos <span class="hljs-keyword">table</span>. The `<span class="hljs-variable">$fillable</span>` property tells Laravel <span class="hljs-keyword">which</span> fields are mass assignable.
+
+<span class="hljs-comment">**Migrate the database**</span>
+#
+
+Now, let's <span class="hljs-keyword">run</span> our migration to create the todos <span class="hljs-keyword">table</span>. <span class="hljs-keyword">Run</span> the following command:
+
+```bash
+php artisan migrate
+</code></pre><p><strong>Edit the views</strong>
+#</p>
+<p>Next, we need to create our views. For this tutorial, we will be using Blade, Laravel&#39;s powerful templating engine. Create a new file <code>app.blade.php</code> inside the <code>resources/views</code> directory.</p>
+<p>```php {5}
+resources
+├───css
+├───js
+└───views
+    │   app.blade.php
+    │   welcome.blade.php</p>
+<pre><code>
+add the following code to `app.blade.php` file.
+
+```html
+<span class="hljs-meta">&lt;!DOCTYPE html&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">"en"</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">"UTF-8"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"viewport"</span> <span class="hljs-attr">content</span>=<span class="hljs-string">"width=device-width, initial-scale=1.0"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>TODO APP<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"bg-gray-200 min-h-screen flex items-center justify-center"</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col"</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">h1</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"mb-5 text-2xl"</span>&gt;</span>Welcome to the TODO app<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre><p>This is a simple HTML template for our application.</p>
+<p><strong>Setup routes</strong>
+#</p>
+<p>Next, we need to define our routes. Open the web.php file inside the routes directory and add the following code:</p>
+<pre><code class="lang-php"><span class="hljs-comment">// web.php</span>
+
+<span class="hljs-keyword">use</span> <span class="hljs-title">App</span>\<span class="hljs-title">Http</span>\<span class="hljs-title">Controllers</span>\<span class="hljs-title">TodoController</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Support</span>\<span class="hljs-title">Facades</span>\<span class="hljs-title">Route</span>;
+
+Route::get(<span class="hljs-string">'/'</span>, [TodoController::class,<span class="hljs-string">'index'</span>])-&gt;name(<span class="hljs-string">'index'</span>);
+</code></pre>
+<p>This route will handle the display of our todos.
+#
+<strong>Setup Controller</strong>
+#</p>
+<p>Now, let&#39;s create the logic for displaying our todos. Open the <code>TodoController</code> and add the following code:</p>
+<pre><code class="lang-php"><span class="php"><span class="hljs-meta">&lt;?php</span>
+
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">App</span>\<span class="hljs-title">Http</span>\<span class="hljs-title">Controllers</span>;
+
+<span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Http</span>\<span class="hljs-title">Request</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Controller</span>
+</span>{
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">index</span><span class="hljs-params">(Request $request)</span> </span>{
+        <span class="hljs-keyword">return</span> view(<span class="hljs-string">'app'</span>);
+    }
+}</span>
+</code></pre>
+<p>This controller method will return our app view.</p>
+<p><strong>Run the Server</strong></p>
+<p>At this point, we can test our application. Run the following command to start the Laravel server:</p>
+<pre><code class="lang-php"><span class="hljs-attribute">php artisan serve</span>
+</code></pre>
+<p>You should now be able to access your application at <a href="http://localhost:8000">http://localhost:8000</a>.
+#
+<img src="https://blog.shahryartayeb.com/uploads/67/conversions/untitled-webp.webp" alt="desc">
+#
+<strong>Add HTMX and Tailwindcss</strong>
+#</p>
+<p>Next, we will add HTMX and Tailwind CSS to our application. We will use a CDN for this tutorial. Update the <code>app.blade.php</code> file as follows:</p>
+<p>```html {8-14,16-17}
+&lt;!DOCTYPE html&gt;</p>
+<p><html lang="en"></p>
+<p><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO APP</title></p>
+<pre><code><span class="hljs-comment">&lt;!-- HTMX cdn --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> 
+    <span class="hljs-attr">src</span>=<span class="hljs-string">"https://unpkg.com/htmx.org@1.9.5"</span> 
+    <span class="hljs-attr">integrity</span>=<span class="hljs-string">"sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO"</span> 
+    <span class="hljs-attr">crossorigin</span>=<span class="hljs-string">"anonymous"</span>
+&gt;</span><span class="undefined">
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+    <span class="hljs-comment">&lt;!-- TailwindCss --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://cdn.tailwindcss.com"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre><p></head></p>
+<body class="bg-gray-200 min-h-screen flex items-center justify-center">
+
+<pre><code>&lt;<span class="hljs-keyword">div</span> <span class="hljs-built_in">class</span>=<span class="hljs-string">"bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col"</span>&gt;
+        &lt;h1 <span class="hljs-built_in">class</span>=<span class="hljs-string">"mb-5 text-2xl"</span>&gt;Welcome <span class="hljs-keyword">to</span> <span class="hljs-keyword">the</span> TODO app&lt;/h1&gt;
+
+
+&lt;/<span class="hljs-keyword">div</span>&gt;
+</code></pre><p></body>
+</html></p>
+<pre><code>
+Now, we have <span class="hljs-keyword">all</span> our dependencies installed <span class="hljs-keyword">and</span> setup. Let<span class="hljs-symbol">'s</span> get into the coding part.
+
+## List <span class="hljs-keyword">all</span> Todos
+
+First, we need to fetch <span class="hljs-keyword">all</span> todos from our database. Update the index method <span class="hljs-keyword">in</span> the `TodoController` as follows:
+
+```php
+<span class="hljs-keyword">use</span> App\Models\Todo;
+
+public <span class="hljs-keyword">function</span> <span class="hljs-title">index</span>(Request $request) {
+    $todos = Todo::latest()-&gt;get();
+
+    <span class="hljs-keyword">return</span> view(<span class="hljs-symbol">'app</span>',compact(<span class="hljs-symbol">'todos</span>'));
+}
+</code></pre><p>This method fetches all todos from the database and passes them to the app view.</p>
+<p>Next, we need to display these todos in our view. Update the <code>app.blade.php</code> file as follows:</p>
+<pre><code class="lang-html"><span class="xml"><span class="hljs-comment">&lt;!-- Todos List --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">ul</span> 
+        <span class="hljs-attr">id</span>=<span class="hljs-string">"todo-list"</span> 
+        <span class="hljs-attr">class</span>=<span class="hljs-string">"list-reset"</span>
+&gt;</span>
+    @forelse ($todos as $todo)
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span></span><span class="hljs-template-variable">{{ $todo-&gt;name }}</span><span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+    @empty
+         <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"py-2 px-4 bg-red-100 text-red-700 border-l-4 border-red-500"</span>&gt;</span>
+                        No todos yet !
+                    <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+    @endforelse
+<span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span></span>
+</code></pre>
+<p>This code displays each todo in an unordered list. If there are no todos, it displays a message saying &quot;No todos yet!&quot;.</p>
+<h2 id="create-a-todo">Create a Todo</h2>
+<p>Next, we need to create a form for adding new todos. we need to handle the form submission. Add the following route to the web.php file:</p>
+<pre><code class="lang-php"><span class="hljs-comment">// web.php</span>
+
+Route::post(<span class="hljs-string">'/todo'</span>, [TodoController::<span class="hljs-keyword">class</span>,<span class="hljs-string">'store'</span>])-&gt;name(<span class="hljs-string">'store'</span>);
+</code></pre>
+<p>Next, add the following method to the <code>TodoController</code>:</p>
+<pre><code class="lang-php"><span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">store</span><span class="hljs-params">(Request $request)</span> </span>{
+
+    $validated = $request-&gt;validate([
+        <span class="hljs-string">'name'</span> =&gt; <span class="hljs-string">'required|string'</span>
+    ]);
+
+    $todo = Todo::create($validated);
+
+    <span class="hljs-keyword">return</span> view(<span class="hljs-string">'partials.todo-item'</span>,[
+        <span class="hljs-string">'todo'</span> =&gt; $todo
+    ]);
+}
+</code></pre>
+<p>This method validates the request data, creates a new todo, and returns a partial view with the new todo.</p>
+<p>#</p>
+<p>Finally, create a new file todo-item.blade.php inside the <code>resources/views/partials</code> directory and add the following code:</p>
+<p>```php {7,8}
+resources
+├───css
+├───js
+└───views
+    │   app.blade.php
+    ├───pages
+    └───partials
+            todo-item.blade.php</p>
+<pre><code>
+<span class="hljs-keyword">For</span> the html partial component, just add the html related to only <span class="hljs-keyword">one</span> todo. <span class="hljs-keyword">In</span> our simple case we only have <span class="hljs-keyword">one</span> `&lt;<span class="hljs-keyword">li</span>&gt;` element.
+
+```php
+&lt;<span class="hljs-keyword">li</span>&gt;{{ <span class="hljs-variable">$todo</span>-&gt;name }}&lt;/<span class="hljs-keyword">li</span>&gt;
+</code></pre><p>Now we have all our required component let’s send the request with HTMX</p>
+<p>```html {3-5}
+<!-- Add todo form --></p>
+<form
+    hx-post="/todo" 
+    hx-target="#todo-list"
+    hx-swap="beforeend"
+    class="mb-4"
+
+>
+    @csrf
+    <div class="mb-4">
+        <label class="block text-grey-darker text-sm font-bold mb-2" for="todo">
+            Name
+        </label>
+
+        <input 
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" 
+            type="text" 
+            name="name" 
+            placeholder="Enter your todo"
+        >
+    </div>
+    <button 
+        class="bg-blue-500 hover:bg-blue-dark text-white font-bold py-2 px-4 rounded" 
+        type="submit"
+    >
+        Add
+    </button>
+</form>
+
+<!-- Todos List -->
+<pre><code>
+This form sends a POST request to /todo when submitted. The hx-post attribute is used by HTMX to make the request. The hx-target and hx-swap attributes tell HTMX <span class="hljs-keyword">where</span> to place the response <span class="hljs-keyword">from</span> the server.
+#
+![desc](https:<span class="hljs-comment">//blog.shahryartayeb.com/uploads/69/add-todo.gif)</span>
+
+## Delete a Todo
+
+Next, we need to add the ability to delete todos. Add the following route to the web.php file:
+
+```php
+Route::delete(<span class="hljs-string">'/todo/{todo}'</span>, [TodoController::<span class="hljs-keyword">class</span>,<span class="hljs-string">'destroy'</span>])-&gt;name(<span class="hljs-string">'destroy'</span>);
+</code></pre><p>This route will handle the deletion of todos.</p>
+<p>Next, add the following method to the TodoController:</p>
+<pre><code class="lang-php"><span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">destroy</span><span class="hljs-params">(Request $request,Todo $todo)</span> </span>{
+    $todo-&gt;delete();
+
+    <span class="hljs-comment">// Htmx checks for 200 status code</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-string">'Deleted'</span>;
+}
+</code></pre>
+<p>This method deletes the specified todo and returns a response with a 200 status code.</p>
+<p>Finally, update the todo-item.blade.php file as follows:</p>
+<p>```html {2,6-15}</p>
+<p><li class="flex items-center justify-between p-4 bg-white shadow rounded-md mb-2">
+    <span class="@if($todo->is_completed) line-through text-gray-500 @else text-gray-800 @endif">
+        {{ $todo-&gt;name }}
+    </span></p>
+<pre><code><span class="xml"><span class="hljs-comment">&lt;!-- To Delete --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">form</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"inline-block"</span>&gt;</span>
+    @csrf
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+        <span class="hljs-attr">hx-delete</span>=<span class="hljs-string">"/todo/</span></span></span><span class="hljs-template-variable">{{$todo-&gt;id}}</span><span class="xml"><span class="hljs-tag"><span class="hljs-string">"</span>
+        <span class="hljs-attr">class</span>=<span class="hljs-string">"bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"</span>
+    &gt;</span>
+        x
+    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span> 
+<span class="hljs-tag">&lt;/<span class="hljs-name">form</span>&gt;</span></span>
+</code></pre><p></li></p>
+<pre><code>
+This <span class="hljs-selector-tag">code</span> adds <span class="hljs-selector-tag">a</span> delete <span class="hljs-selector-tag">button</span> to each todo. When clicked, it sends <span class="hljs-selector-tag">a</span> DELETE request to /todo/{todo}. The hx-delete attribute is used by HTMX to make the request. The hx-confirm attribute adds <span class="hljs-selector-tag">a</span> confirmation prompt before deleting the todo. The hx-target attribute tells HTMX to remove the closest <span class="hljs-selector-tag">li</span> element when the request is successful.
+
+Update the app<span class="hljs-selector-class">.blade</span><span class="hljs-selector-class">.php</span> file to use the partial, so that we could avoid duplicate <span class="hljs-selector-tag">code</span>.
+
+```<span class="hljs-selector-tag">html</span> {<span class="hljs-number">3</span>-<span class="hljs-number">6</span>,<span class="hljs-number">9</span>}
+&lt;!-- Todos List --&gt;
+&lt;<span class="hljs-selector-tag">ul</span> 
+    id=<span class="hljs-string">"todo-list"</span>
+    hx-confirm=<span class="hljs-string">"Are you sure?"</span> 
+    hx-target=<span class="hljs-string">"closest li"</span> 
+    hx-swap=<span class="hljs-string">"outerHTML swap:1s"</span>
+&gt;
+    @forelse (<span class="hljs-variable">$todos</span> as <span class="hljs-variable">$todo</span>)
+        @include(<span class="hljs-string">'partials.todo-item'</span>)
+    @empty
+        &lt;<span class="hljs-selector-tag">li</span> class=<span class="hljs-string">"py-2 px-4 bg-red-100 text-red-700 border-l-4 border-red-500"</span>&gt;
+            No todos yet !
+        &lt;/li&gt;
+    @endforelse
+&lt;/ul&gt;
+</code></pre><p>#
+<img src="https://blog.shahryartayeb.com/uploads/68/delete-todo.gif" alt="desc"></p>
+<h2 id="update-a-todo">Update a Todo</h2>
+<p>Finally, we need to add the ability to update todos. Add the following route to the web.php file:</p>
+<pre><code class="lang-php">Route::put(<span class="hljs-string">'/todo/{todo}/toggle-completed'</span>, [TodoController::<span class="hljs-keyword">class</span>,<span class="hljs-string">'destroy'</span>])
+        -&gt;name(<span class="hljs-string">'toggle-completed'</span>);
+</code></pre>
+<p>This route will handle the updating of todos.</p>
+<p>Next, add the following method to the TodoController:</p>
+<pre><code class="lang-php"><span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">toggleCompleted</span><span class="hljs-params">(Todo $todo)</span> </span>{
+    $todo-&gt;is_completed = !$todo-&gt;is_completed;
+
+    $todo-&gt;save();
+
+    <span class="hljs-keyword">return</span> view(<span class="hljs-string">'partials.todo-item'</span>,[
+        <span class="hljs-string">'todo'</span> =&gt; $todo
+    ]); 
+}
+</code></pre>
+<p>This method toggles the is_completed attribute of the specified todo and returns a partial view with the updated todo.</p>
+<p>Finally, update the todo-item.blade.php file as follows:</p>
+<p>```html {17-26}</p>
+<p><li class="flex items-center justify-between p-4 bg-white shadow rounded-md mb-2">
+    <span class="@if($todo->is_completed) line-through text-gray-500 @else text-gray-800 @endif">
+        {{ $todo-&gt;name }}
+    </span></p>
+<pre><code><span class="xml"><span class="hljs-comment">&lt;!-- To Delete --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">form</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"inline-block"</span>&gt;</span>
+    @csrf
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+        <span class="hljs-attr">hx-delete</span>=<span class="hljs-string">"/todo/</span></span></span><span class="hljs-template-variable">{{$todo-&gt;id}}</span><span class="xml"><span class="hljs-tag"><span class="hljs-string">"</span>
+        <span class="hljs-attr">class</span>=<span class="hljs-string">"bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"</span>
+    &gt;</span>
+        x
+    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span> 
+<span class="hljs-tag">&lt;/<span class="hljs-name">form</span>&gt;</span>
+
+<span class="hljs-comment">&lt;!-- To Update --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">form</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"inline-block ml-2"</span>&gt;</span>
+    @csrf
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+        <span class="hljs-attr">hx-put</span>=<span class="hljs-string">"/todo/</span></span></span><span class="hljs-template-variable">{{$todo-&gt;id}}</span><span class="xml"><span class="hljs-tag"><span class="hljs-string">/toggle-completed"</span>
+        <span class="hljs-attr">class</span>=<span class="hljs-string">"bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"</span>
+    &gt;</span>
+        Toggle Completed
+    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span> 
+<span class="hljs-tag">&lt;/<span class="hljs-name">form</span>&gt;</span></span>
+</code></pre><p></li>
+```</p>
+<p>This code adds a button to each todo for marking it as complete or incomplete. When clicked, it sends a PUT request to /todo/{todo}/toggle-completed. </p>
+<p>The hx-post attribute is used by HTMX to make the request. The <code>hx-target</code> attribute tells HTMX to replace the closest <code>li</code> element with the response from the server.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>And that&#39;s it! You have now created a simple Todo application using Laravel, HTMX, and Tailwind CSS. This application allows you to create, update, and delete todos without having to refresh the page. I hope you found this tutorial helpful. Happy coding!</p>
+
 
 
     </main>

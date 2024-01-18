@@ -8,20 +8,20 @@
     <meta name="author" content="Shahryar Tayeb">
     <meta name="description" content="SHTB Blog">
     <link rel="alternate" href="/atom.xml" type="application/atom+xml">
-    <title> | SHTB Blog</title>
+    <title>Automatically Generate ERD of Your Django  Models | SHTB Blog</title>
 
 
     <meta name="description" content="" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-      <meta property="og:description" content="SHTB Blog is an open platform where readers can find latest articles and tutorial about technology and software development." />
+      <meta property="og:description" content="Learn how to automatically generate an ERD of your Django models using the django-extensions package. Plus, a bonus command!" />
 
     <meta property="og:image" content="https://blog.shahryartayeb.com/assets/images/shtb3.webp" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:description" content="SHTB Blog is an open platform where readers can find latest articles and tutorial about technology and software development." />
+      <meta property="twitter:description" content="Learn how to automatically generate an ERD of your Django models using the django-extensions package. Plus, a bonus command!" />
     <meta property="twitter:image" content="https://blog.shahryartayeb.com/assets/images/shtb3.webp" />
 
 
@@ -69,7 +69,293 @@
     <main>
     
 
-  
+      <h2 id="getting-started">Getting Started</h2>
+<p>Automatically Generate ERD of Your Django  Models
+#
+Create django project</p>
+<div class="mockup-code">
+
+<code>bash
+django-admin startproject mysite</code>
+
+</div>
+
+<p>This will create the bellow files and directories.</p>
+<div class="mockup-code">
+
+<code>shell
+mysite/
+    manage.py
+    mysite/
+        __init__.py
+        settings.py
+        urls.py
+        asgi.py
+        wsgi.py</code>
+
+</div>
+
+<p>Create a blog application</p>
+<div class="mockup-code">
+
+<code>bash
+python manage.py startapp blog</code>
+
+</div>
+
+<p>This will create the bellow folders and files.</p>
+<div class="mockup-code">
+
+<code>mysite/
+        ....
+        ....
+blog/
+    migrations/
+        __init__.py
+    __init__.py
+    admin.py
+    apps.py
+    models.py
+    tests.py
+    views.py</code>
+
+</div>
+
+<p>Create a virtual environment and install Django</p>
+<div class="mockup-code">
+
+<code>bash
+# Create virtual environment
+virtualenv .venv
+
+# Activate the virtual environment
+source .venv/bin/activate
+
+# Install Django
+pip install Django</code>
+
+</div>
+
+<h2 id="create-database-models">Create database models</h2>
+<p>Let’s create the database structure of our blog application</p>
+<h3 id="-blog-models-py-"><code>blog/models.py</code></h3>
+<pre><code class="lang-python">from django.contrib.auth.models <span class="hljs-built_in">import</span> User
+from django.db <span class="hljs-built_in">import</span> models
+
+class Category(models.Model):
+    <span class="hljs-attr">name</span> = models.CharField(<span class="hljs-attr">max_length=200)</span>
+    <span class="hljs-attr">slug</span> = models.CharField(<span class="hljs-attr">max_length=200)</span>
+    <span class="hljs-attr">description</span> = models.CharField(<span class="hljs-attr">max_length=350)</span>
+
+    <span class="hljs-attr">updated</span> = models.DateTimeField(<span class="hljs-attr">auto_now=True)</span>
+    <span class="hljs-attr">created</span> = models.DateTimeField(<span class="hljs-attr">auto_now_add=True)</span>
+
+class Article(models.Model):
+    <span class="hljs-attr">user</span> = models.ForeignKey(User, <span class="hljs-attr">on_delete=models.CASCADE)</span>
+    <span class="hljs-attr">categories</span> = models.ManyToManyField(Category, <span class="hljs-attr">related_name="categories")</span>
+
+    <span class="hljs-attr">title</span> = models.CharField(<span class="hljs-attr">max_length=200)</span>
+    <span class="hljs-attr">slug</span> = models.CharField(<span class="hljs-attr">max_length=200)</span>
+    <span class="hljs-attr">title</span> = models.CharField(<span class="hljs-attr">max_length=300)</span>
+    <span class="hljs-attr">content</span> = models.TextField()
+
+    <span class="hljs-attr">updated</span> = models.DateTimeField(<span class="hljs-attr">auto_now=True)</span>
+    <span class="hljs-attr">created</span> = models.DateTimeField(<span class="hljs-attr">auto_now_add=True)</span>
+</code></pre>
+<p>Register the blog application</p>
+<h3 id="mysite-settings-py">mysite/settings.py</h3>
+<pre><code class="lang-python"># <span class="hljs-type">Application</span> definition
+
+<span class="hljs-type">INSTALLED_APPS</span> = [
+    <span class="hljs-symbol">'django</span>.contrib.admin',
+    <span class="hljs-symbol">'django</span>.contrib.auth',
+    <span class="hljs-symbol">'django</span>.contrib.contenttypes',
+    <span class="hljs-symbol">'django</span>.contrib.sessions',
+    <span class="hljs-symbol">'django</span>.contrib.messages',
+    <span class="hljs-symbol">'django</span>.contrib.staticfiles',
+
+        # project apps
+        <span class="hljs-symbol">'blog'</span>
+]
+</code></pre>
+<p>Run the project and migrate the models</p>
+<div class="mockup-code">
+
+<code>bash
+python manage.py makemigrations
+
+python manage.py migrate
+
+python manage.py runserver</code>
+
+</div>
+
+<p>If everything is fine you will get the bellow output.</p>
+<div class="mockup-code">
+
+<code>bash
+❯ python manage.py runserver
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+July 10, 2023 - 09:07:19
+Django version 4.2.3, using settings &#39;mysite.settings&#39;
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.</code>
+
+</div>
+
+<h2 id="install-django-extensions-https-django-extensions-readthedocs-io-en-latest-index-html-package">Install <a href="https://django-extensions.readthedocs.io/en/latest/index.html"><code>django-extensions</code></a> package</h2>
+<p>Django Extensions is a collection of custom extensions for the Django Framework.</p>
+<p>These include management commands, additional database fields, admin extensions and much more.</p>
+<div class="mockup-code">
+
+<code>bash
+pip install django-extensions
+
+# Install pydotplus for graph generation
+pip install pydotplus</code>
+
+</div>
+
+<h3 id="setup-the-package">Setup the package</h3>
+<pre><code class="lang-python"><span class="hljs-keyword">INSTALLED_APPS </span>= [
+    <span class="hljs-string">"django.contrib.admin"</span>,
+    <span class="hljs-string">"django.contrib.auth"</span>,
+    <span class="hljs-string">"django.contrib.contenttypes"</span>,
+    <span class="hljs-string">"django.contrib.sessions"</span>,
+    <span class="hljs-string">"django.contrib.messages"</span>,
+    <span class="hljs-string">"django.contrib.staticfiles"</span>,
+
+    <span class="hljs-comment"># installed apps</span>
+    <span class="hljs-string">"django_extensions"</span>,
+
+    <span class="hljs-comment"># project apps</span>
+    <span class="hljs-string">"blog"</span>,
+]
+</code></pre>
+<h2 id="generate-the-erd">Generate the ERD</h2>
+<h3 id="generate-erd-of-all-your-project-models">Generate ERD of all your project Models</h3>
+<div class="mockup-code">
+
+<code>bash
+# Generate ERD of all your DB tables
+python manage.py graph_models -a -o myapp_models.png</code>
+</div>
+
+<p>#</p>
+<p><img src="https://blog.shahryartayeb.com/uploads/50/conversions/myapp_models-webp.webp" alt="desc"></p>
+<h3 id="generate-erd-of-specific-apps">Generate ERD of specific apps</h3>
+<div class="mockup-code">
+
+<code>bash
+# Generate ERD of specific apps
+# python manage.py graph_models &lt;app_name_1&gt; &lt;app_name_2&gt; -o myapp_models.png
+python manage.py graph_models blog auth -o myapp_models.png</code>
+
+</div>
+
+<p><img src="https://blog.shahryartayeb.com/uploads/51/conversions/myapp_models-(1" alt="desc">-webp.webp)</p>
+<h2 id="bonus-django-extensions-commands">Bonus django-extensions commands</h2>
+<p>Other usefull commands of django-extensions package.
+#</p>
+<div class="mockup-code">
+
+<code>shell
+❯ pm show_urls # List all you app urls
+
+
+❯ python manage.py shell_plus
+❯ python manage.py shell_plus --print-sql
+
+
+❯ python manage.py list_signals
+
+
+❯ python manage.py  reset_db # Reset your database and prepare it for new migration</code>
+
+</div>
+
+<h3 id="generate-admin-panel-classes">Generate admin panel Classes</h3>
+<div class="mockup-code">
+
+<code>bash
+
+# python manage.py admin_generator &lt;your_app_name&gt;
+❯ python manage.py admin_generator blog</code>
+
+</div>
+
+<p>Generated Admin Classes</p>
+<pre><code class="lang-python"><span class="hljs-keyword">from</span> django.contrib <span class="hljs-keyword">import</span> admin
+
+<span class="hljs-keyword">from</span> .models <span class="hljs-keyword">import</span> Category, Article
+
+
+<span class="hljs-meta">@admin.register(Category)</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CategoryAdmin</span><span class="hljs-params">(admin.ModelAdmin)</span>:</span>
+    list_display = (
+        <span class="hljs-string">'id'</span>,
+        <span class="hljs-string">'name'</span>,
+        <span class="hljs-string">'slug'</span>,
+        <span class="hljs-string">'description'</span>,
+        <span class="hljs-string">'updated'</span>,
+        <span class="hljs-string">'created'</span>,
+    )
+    list_filter = (<span class="hljs-string">'updated'</span>, <span class="hljs-string">'created'</span>)
+    search_fields = (<span class="hljs-string">'name'</span>, <span class="hljs-string">'slug'</span>)
+    prepopulated_fields = {<span class="hljs-string">'slug'</span>: [<span class="hljs-string">'name'</span>]}
+
+
+<span class="hljs-meta">@admin.register(Article)</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ArticleAdmin</span><span class="hljs-params">(admin.ModelAdmin)</span>:</span>
+    list_display = (
+        <span class="hljs-string">'id'</span>,
+        <span class="hljs-string">'user'</span>,
+        <span class="hljs-string">'slug'</span>,
+        <span class="hljs-string">'title'</span>,
+        <span class="hljs-string">'content'</span>,
+        <span class="hljs-string">'updated'</span>,
+        <span class="hljs-string">'created'</span>,
+    )
+    list_filter = (<span class="hljs-string">'user'</span>, <span class="hljs-string">'updated'</span>, <span class="hljs-string">'created'</span>)
+    raw_id_fields = (<span class="hljs-string">'categories'</span>,)
+    search_fields = (<span class="hljs-string">'slug'</span>,)
+</code></pre>
+<h3 id="display-a-model-s-info">Display a model&#39;s info</h3>
+<div class="mockup-code">
+
+<code>bash
+# python manage.py list_model_info --model &lt;app_name.Model&gt;
+❯ python manage.py list_model_info --model blog.Article
+
+: &#39;
+blog.Article
+    Fields:
+        id -
+        user -
+        slug -
+        title -
+        content -
+        updated -
+        created -
+        categories -
+    Methods (non-private/internal):
+        adelete()
+        arefresh_from_db()
+        asave()
+        get_constraints()
+        get_next_by_created()
+        get_next_by_updated()
+        get_previous_by_created()
+        get_previous_by_updated()
+        validate_constraints()
+
+Total Models Listed: 1
+&#39;</code>
+
+</div>
 
 
     </main>
